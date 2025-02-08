@@ -1,0 +1,8 @@
+syntax = "proto3";
+package com.alimin.fk.pb;
+
+import "FkPbValue.proto";
+
+message FkValueMap {
+  map<string, FkPbValue> value = 1;
+}
