@@ -1,0 +1,10 @@
+syntax = "proto3";
+package com.alimin.fk.pb;
+
+message FkPbValue {
+  int32 int32Val = 1;
+  int64 int64Val = 2;
+  float floatVal = 3;
+  double doubleVal = 4;
+  string strVal = 5;
+}
