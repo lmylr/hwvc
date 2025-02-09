@@ -14,6 +14,13 @@
 #include "include/core/SkPixelRef.h"
 #include "libyuv.h"
 
+#define TAG "FkBitmap"
+
+static constexpr skcms_Matrix3x3 kDCI_P3_D65 = {{{0.515102f, 0.291965f, 0.157153f},
+                                                 {0.241182f, 0.692236f, 0.0665819f},
+                                                 {-0.00104941f, 0.0418818f, 0.784378f},
+                                                }};
+
 FK_IMPL_CLASS_TYPE(FkBitmap, FkObject)
 
 std::shared_ptr<FkBitmap> FkBitmap::create(const int32_t width, const int32_t height) {
@@ -102,7 +109,7 @@ FkBitmap::FkBitmap(const int32_t width, const int32_t height) : FkObject() {
     bmp = std::make_shared<SkBitmap>();
     bmp->setInfo(SkImageInfo::Make(width, height, kRGBA_8888_SkColorType,kOpaque_SkAlphaType));
     if (!bmp->tryAllocPixels()) {
-        FkLogI(FK_DEF_TAG, "Can not alloc pixels memory with size.");
+        FkLogI(TAG, "Can not alloc pixels memory with size.");
         bmp = nullptr;
         return;
     }
@@ -111,20 +118,22 @@ FkBitmap::FkBitmap(const int32_t width, const int32_t height) : FkObject() {
 FkBitmap::FkBitmap(const sk_sp<SkData> &data) : FkObject() {
     std::unique_ptr<SkCodec> codec = SkCodec::MakeFromData(data);
     if (!codec) {
-        FkLogI(FK_DEF_TAG, "Can not find codec for SkData");
+        FkLogI(TAG, "Can not find codec for SkData");
         return;
     }
-    SkImageInfo info = codec->getInfo().makeColorType(kN32_SkColorType)
-            .makeAlphaType(SkAlphaType::kPremul_SkAlphaType);
+    auto info = codec->getInfo();
     bmp = std::make_shared<SkBitmap>();
     if (!bmp->tryAllocPixels(info)) {
-        FkLogI(FK_DEF_TAG, "Can not alloc pixels memory with encoded data.");
+        FkLogI(TAG, "Can not alloc pixels memory with encoded data.");
         return;
     }
-    if (SkCodec::kSuccess != codec->getPixels(info, bmp->getPixels(), bmp->rowBytes())) {
-        FkLogI(FK_DEF_TAG, "Can not read pixels.");
+    FkLogI(TAG, "bytesPerPixel=%d, byteSize=%d", bmp->bytesPerPixel(), bmp->computeByteSize());
+    SkImageInfo dstInfo = info.makeColorSpace(nullptr).makeAlphaType(kUnpremul_SkAlphaType);
+    if (SkCodec::kSuccess != codec->getPixels(dstInfo, bmp->getPixels(), bmp->rowBytes())) {
+        FkLogI(TAG, "Can not read pixels.");
     }
     _setEncodedOrigin(codec->getOrigin());
+    FkLogI(TAG, "ICCProfile: %s", getColorProfileDescription().c_str());
 }
 
 FkBitmap::FkBitmap(const std::vector<std::shared_ptr<FkBuffer>> &planes, FkSize size,
@@ -148,7 +157,7 @@ FkBitmap::FkBitmap(const std::vector<std::shared_ptr<FkBuffer>> &planes, FkSize 
     bmp = std::make_shared<SkBitmap>();
     bmp->setInfo(SkImageInfo::Make(rotatedSize.getWidth(), rotatedSize.getHeight(), kRGBA_8888_SkColorType,kOpaque_SkAlphaType));
     if (!bmp->tryAllocPixels()) {
-        FkLogI(FK_DEF_TAG, "Can not alloc pixels memory with planes.");
+        FkLogI(TAG, "Can not alloc pixels memory with planes.");
         bmp = nullptr;
         return;
     }
@@ -182,7 +191,7 @@ FkBitmap::FkBitmap(const FkBitmap &o) : FkObject(o) {
 
 void FkBitmap::_setEncodedOrigin(int32_t skEncodedOrigin) {
     encodedOrigin = static_cast<FkEncodedOrigin>(skEncodedOrigin);
-    FkLogI(FK_DEF_TAG, "orientation: %d", encodedOrigin);
+    FkLogI(TAG, "orientation: %d", encodedOrigin);
 }
 
 FkBitmap::~FkBitmap() {
@@ -251,4 +260,89 @@ FkResult FkBitmap::write(const std::string &file, FkImage::Format fmt, int quali
         return FK_IO_FAIL;
     }
     return FK_FAIL;
+}
+
+static bool nearly_equal(float x, float y) {
+    static constexpr float kTolerance = 1.0f / (1 << 11);
+    return ::fabsf(x - y) <= kTolerance;
+}
+
+static bool nearly_equal(const skcms_TransferFunction& u,
+                         const skcms_TransferFunction& v) {
+    return nearly_equal(u.g, v.g)
+           && nearly_equal(u.a, v.a)
+           && nearly_equal(u.b, v.b)
+           && nearly_equal(u.c, v.c)
+           && nearly_equal(u.d, v.d)
+           && nearly_equal(u.e, v.e)
+           && nearly_equal(u.f, v.f);
+}
+
+static bool nearly_equal(const skcms_Matrix3x3& u, const skcms_Matrix3x3& v) {
+    for (int r = 0; r < 3; r++) {
+        for (int c = 0; c < 3; c++) {
+            if (!nearly_equal(u.vals[r][c], v.vals[r][c])) {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+std::string FkBitmap::getColorProfileDescription() {
+    if (bmp == nullptr) {
+        return {};
+    }
+    auto colorSpace = bmp->colorSpace();
+    if (colorSpace == nullptr) {
+        return {};
+    }
+    skcms_TransferFunction fn;
+    skcms_Matrix3x3 toXYZD50;
+    colorSpace->invTransferFn(&fn);
+    colorSpace->toXYZD50(&toXYZD50);
+    bool srgb_xfer = nearly_equal(fn, SkNamedTransferFn::kSRGB);
+    bool srgb_gamut = nearly_equal(toXYZD50, SkNamedGamut::kSRGB);
+    if (srgb_xfer && srgb_gamut) {
+        return "sRGB";
+    }
+    bool line_xfer = nearly_equal(fn, SkNamedTransferFn::kLinear);
+    if (line_xfer && srgb_gamut) {
+        return "Linear Transfer with sRGB Gamut";
+    }
+    bool twoDotTwo = nearly_equal(fn, SkNamedTransferFn::k2Dot2);
+    if (twoDotTwo && srgb_gamut) {
+        return "2.2 Transfer with sRGB Gamut";
+    }
+    if (twoDotTwo && nearly_equal(toXYZD50, SkNamedGamut::kAdobeRGB)) {
+        return "AdobeRGB";
+    }
+    bool display_p3 = nearly_equal(toXYZD50, SkNamedGamut::kDisplayP3);
+    if (srgb_xfer || line_xfer) {
+        if (srgb_xfer && display_p3) {
+            return "sRGB Transfer with Display P3 Gamut";
+        }
+        if (line_xfer && display_p3) {
+            return "Linear Transfer with Display P3 Gamut";
+        }
+        bool rec2020 = nearly_equal(toXYZD50, SkNamedGamut::kRec2020);
+        if (srgb_xfer && rec2020) {
+            return "sRGB Transfer with Rec-BT-2020 Gamut";
+        }
+        if (line_xfer && rec2020) {
+            return "Linear Transfer with Rec-BT-2020 Gamut";
+        }
+    } else {
+        if (display_p3) {
+            return "Unknown Transfer with Display P3 Gamut";
+        }
+//        FkLogI(TAG, "0[%f, %f, %f]", toXYZD50.vals[0][0], toXYZD50.vals[0][1], toXYZD50.vals[0][2]);
+//        FkLogI(TAG, "1[%f, %f, %f]", toXYZD50.vals[1][0], toXYZD50.vals[1][1], toXYZD50.vals[1][2]);
+//        FkLogI(TAG, "2[%f, %f, %f]", toXYZD50.vals[2][0], toXYZD50.vals[2][1], toXYZD50.vals[2][2]);
+        bool rec2020 = nearly_equal(toXYZD50, SkNamedGamut::kRec2020);
+        if (rec2020) {
+            return "Unknown Transfer with Rec-BT-2020 Gamut";
+        }
+    }
+    return {};
 }

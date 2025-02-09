@@ -71,6 +71,8 @@ public:
 
     bool isSwappedWH();
 
+    std::string getColorProfileDescription();
+
     FkResult write(const std::string &file, FkImage::Format fmt, int quality);
 
 //    AlRational getRotation();
