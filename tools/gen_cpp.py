@@ -3,9 +3,14 @@ import argparse
 from string import Template
 import socket
 import time
+from pathlib import Path
 
 def write(file, content):
     print("Generate: %s" % file)
+    dirStr = os.path.dirname(file)
+    if os.path.exists(dirStr) == False:
+        dirPath = Path(dirStr)
+        dirPath.mkdir(parents = True)
     with open(file, "w") as f:
         f.write(content)
 
@@ -13,13 +18,14 @@ def fillTemplate(template):
     authorStr = socket.gethostname()
     with os.popen("git config user.email",'r',-1) as f:
         authorStr = f.readline()
+    authorStr = "filmkilns(email: filmkilns@outlook.com, github: https://github.com/filmkilns)"
     return template.substitute(
         moduleName=args.module,
         className=args.name,
         tagHeader=(args.module.replace("Fk", "Fk_") + "_" + args.name + "_H").upper(),
         author=authorStr,
         time=time.strftime("%Y-%m-%d %H:%M:%S"),
-        email="aliminabc@gmail.com"
+        email=authorStr
     )
 
 def gen(args, templateDir):
