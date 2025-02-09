@@ -1,8 +1,9 @@
 cmake_minimum_required(VERSION 3.4.1)
-project(FkBitmap LANGUAGES C CXX)
+project(FkCodec LANGUAGES C CXX)
 
 set(INCLUDES
         ${ANDROID_NDK}/sources/android/cpufeatures
+        ${PROJECT_SOURCE_DIR}
         ${PROJECT_SOURCE_DIR}/include
         )
 include_directories(${INCLUDES})
@@ -27,19 +28,6 @@ if (${ENABLE_BAN_WARNING})
 endif ()
 message(STATUS "${PROJECT_NAME} CMAKE_CXX_FLAGS: ${CMAKE_CXX_FLAGS}")
 
-#------------------SHARED START----------------------
-add_library(yuv SHARED IMPORTED)
-set_target_properties(yuv PROPERTIES IMPORTED_LOCATION
-        "${THIRD_PARTY_DIR}/yuv/shared/${ANDROID_ABI}/libyuv.so")
-
-if (NOT ENABLE_SKIA_SRC)
-    add_library(skia SHARED IMPORTED)
-    set_target_properties(skia PROPERTIES IMPORTED_LOCATION
-            "${THIRD_PARTY_DIR}/skia/shared/${ANDROID_ABI}/libskia.so")
-endif (ENABLE_SKIA_SRC)
-
-#------------------SHARED END----------------------
-
 aux_source_directory(${PROJECT_SOURCE_DIR}/core SOURCES_CORE)
 
 list(APPEND SOURCES_ROOT ${SOURCES_CORE})
@@ -60,13 +48,5 @@ find_library(
         log-lib
         log)
 add_library(${PROJECT_NAME} OBJECT ${SOURCES_ROOT})
-target_link_libraries(
-        ${PROJECT_NAME}
-        PUBLIC
-        android
-        yuv
-        skia
-        FkBase
-        FkCodec
-        ${log-lib})
-target_include_directories(${PROJECT_NAME} PUBLIC ${PROJECT_SOURCE_DIR}/include ${PROJECT_SOURCE_DIR}/../skia ${PROJECT_SOURCE_DIR}/../third_party/yuv/include)
+target_link_libraries(${PROJECT_NAME} PUBLIC FkBase ${log-lib})
+target_include_directories(${PROJECT_NAME} PUBLIC ${PROJECT_SOURCE_DIR}/include)
