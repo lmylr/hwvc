@@ -240,6 +240,10 @@ class FkImageEngine {
     return editorChannel.capture(handle);
   }
 
+  Future<int> reqTest() async {
+    return editorChannel.reqTest(handle);
+  }
+
   void notifyCameraExposure(int expValue) async {
     editorChannel.notifyCameraExposure(handle, expValue);
   }

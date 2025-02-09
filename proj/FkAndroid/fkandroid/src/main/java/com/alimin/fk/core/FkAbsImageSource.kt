@@ -15,6 +15,8 @@ abstract class FkAbsImageSource {
 
         external fun nativeCreateYUV420(instance: FkAbsImageSource, planes: Array<ByteBuffer>, width: Int, height: Int, orientation: Int): Long
 
+        external fun nativeCreateBitmap(instance: FkAbsImageSource, buf: ByteBuffer, width: Int, height: Int): Long
+
         external fun nativeDestroy(handle: Long)
     }
 

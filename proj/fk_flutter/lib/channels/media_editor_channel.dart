@@ -53,6 +53,10 @@ class MediaEditorChannel {
     return _invokeMethod("capture", handle);
   }
 
+  Future<int> reqTest(Pointer<Void> handle) async {
+    return _invokeMethod("reqTest", handle);
+  }
+
   Future<int> notifyCameraExposure(Pointer<Void> handle, int expValue) async {
     return _invokeMethod("onCameraExposureUpdate", handle, {"exposure_value": expValue});
   }

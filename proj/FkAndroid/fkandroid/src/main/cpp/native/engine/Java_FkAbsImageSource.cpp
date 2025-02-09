@@ -56,6 +56,15 @@ JNIEXPORT jlong JNICALL Java_com_alimin_fk_core_FkAbsImageSource_00024Companion_
     return 0;
 }
 
+JNIEXPORT jlong JNICALL Java_com_alimin_fk_core_FkAbsImageSource_00024Companion_nativeCreateBitmap
+        (JNIEnv *env, jobject that, jobject instance, jobject buf, jint width, jint height) {
+    auto address = env->GetDirectBufferAddress(buf);
+    auto bitmap = FkBitmap::create(width, height);
+    memcpy(bitmap->getPixels(), address, width * height * 4);
+    auto source = std::make_shared<FkCompressedImageSource>(instance, bitmap, FkEncodedOrigin::kDefault);
+    return FkInstanceHolder::getInstance().put(std::dynamic_pointer_cast<FkAbsImageSource>(source));
+}
+
 JNIEXPORT void JNICALL Java_com_alimin_fk_core_FkAbsImageSource_00024Companion_nativeDestroy
         (JNIEnv *env, jobject that, jlong handle) {
     FkInstanceHolder::getInstance().release(handle);

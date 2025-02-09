@@ -20,14 +20,14 @@ import com.alimin.fk.core.FkAbsImageSource
 import com.alimin.fk.define.kScaleType
 import com.alimin.fk.device.FkAbsCamera
 import com.alimin.fk.device.FkCamera2
-import com.alimin.fk.source.FkCompressedImageSource
 import com.alimin.fk.device.OnCaptureListener
 import com.alimin.fk.device.OnInfoListener
 import com.alimin.fk.engine.FkImage
-import com.alimin.fk.entity.FkCameraAvailableKey
 import com.alimin.fk.entity.FkCameraFeatures
 import com.alimin.fk.entity.FkCameraSettings
 import com.alimin.fk.entity.FkResult
+import com.alimin.fk.source.FkBitmapSource
+import com.alimin.fk.utils.FkLogcat
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.android.FlutterActivityLaunchConfigs
 import io.flutter.embedding.engine.FlutterEngine
@@ -188,6 +188,26 @@ class MainActivity : FlutterActivity(), MethodChannel.MethodCallHandler, Texture
             "onCameraExposureUpdate" -> {
                 val expValue = arguments["exposure_value"] as Int?
                 runOnUiThread { expValue?.let { camera?.updateExposure(expValue) } }
+                return
+            }
+            "reqTest" -> {
+                val handle = arguments["handle"] as Int
+                val path = "/sdcard/Android/data/com.alimin.fk_flutter/files/wide-gamut-tests-master/P3-sRGB-red.png"
+//                val path = "/sdcard/Android/data/com.alimin.fk_flutter/files/P3_1714017400378.png"
+                BitmapFactory.decodeFile(path)
+                    ?.let {
+                        FkLogcat.i(
+                            "FkBitmap",
+                            "colorSpace=${it.byteCount}, colorSpace=${it.colorSpace?.name}"
+                        )
+                        val buffer = ByteBuffer.allocateDirect(it.byteCount)
+                        it.copyPixelsToBuffer(buffer)
+                        val source = FkBitmapSource(buffer, it.width, it.height)
+                        val engine = FkImage(handle.toLong())
+                        val layerId = engine.newLayerWithSource(source)
+                        FkLogcat.i("FkBitmap", "FkBitmapSource layerId=$layerId")
+                        result.success(layerId)
+                    }
                 return
             }
         }
