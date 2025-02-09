@@ -8,6 +8,7 @@ import android.os.Message
 import android.util.Log
 import com.alimin.fk.entity.FkAudioSettings
 import com.alimin.fk.entity.FkResult
+import com.alimin.fk.utils.FkLogcat
 import java.io.File
 import java.io.FileInputStream
 import java.nio.ByteBuffer
@@ -48,17 +49,17 @@ open class FkSpeaker : FkDevice() {
                             }
                         }
                     }
-//                    Log.i(TAG, "Read: ${timestamp.nanoTime}/${System.nanoTime()}, ${timestamp.framePosition}, $size")
+//                    FkLogcat.i(TAG, "Read: ${timestamp.nanoTime}/${System.nanoTime()}, ${timestamp.framePosition}, $size")
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
             }
         }
-        Log.i(TAG, "Stop play loop")
+        FkLogcat.i(TAG, "Stop play loop")
     }
 
     fun init(settings: FkAudioSettings, path: String): FkResult {
-        Log.e(TAG, "Path: $path")
+        FkLogcat.e(TAG, "Path: $path")
         val file = File(path)
         if (!file.exists()) {
             return FkResult.FILE_NOT_FOUND
@@ -101,13 +102,13 @@ open class FkSpeaker : FkDevice() {
 
     fun start(): FkResult {
         if (AudioTrack.STATE_INITIALIZED != mTrack.playState) {
-            Log.e(TAG, "Invalid state: ${mTrack.playState}")
+            FkLogcat.e(TAG, "Invalid state: ${mTrack.playState}")
             return FkResult.INVALID_STATE
         }
         try {
             mTrack.play()
             if (AudioTrack.PLAYSTATE_PLAYING != mTrack.playState) {
-                Log.e(TAG, "Start failed. Invalid state: ${mTrack.playState}")
+                FkLogcat.e(TAG, "Start failed. Invalid state: ${mTrack.playState}")
                 return FkResult.INVALID_STATE
             }
             strategy?.farTimestampInNano = Long.MIN_VALUE
@@ -122,7 +123,7 @@ open class FkSpeaker : FkDevice() {
 
     fun pause(): FkResult {
         if (AudioTrack.PLAYSTATE_PLAYING != mTrack.playState) {
-            Log.e(TAG, "Invalid state: ${mTrack.playState}")
+            FkLogcat.e(TAG, "Invalid state: ${mTrack.playState}")
             return FkResult.INVALID_STATE
         }
         try {
@@ -137,7 +138,7 @@ open class FkSpeaker : FkDevice() {
 
     fun stop(): FkResult {
         if (AudioTrack.PLAYSTATE_PLAYING != mTrack.playState && AudioTrack.PLAYSTATE_PAUSED != mTrack.playState) {
-            Log.e(TAG, "Invalid state: ${mTrack.playState}")
+            FkLogcat.e(TAG, "Invalid state: ${mTrack.playState}")
             return FkResult.INVALID_STATE
         }
         try {
@@ -153,7 +154,7 @@ open class FkSpeaker : FkDevice() {
     fun release(): FkResult {
         stop()
         if (AudioTrack.PLAYSTATE_STOPPED != mTrack.playState) {
-            Log.e(TAG, "Invalid state: ${mTrack.playState}")
+            FkLogcat.e(TAG, "Invalid state: ${mTrack.playState}")
             return FkResult.INVALID_STATE
         }
         mThread.quitSafely()

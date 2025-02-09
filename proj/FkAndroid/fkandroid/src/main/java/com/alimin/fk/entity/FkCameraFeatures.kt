@@ -13,6 +13,7 @@ import android.util.Log
 import android.util.Range
 import android.util.Size
 import android.view.Surface
+import com.alimin.fk.utils.FkLogcat
 import java.util.Arrays
 import java.util.HashMap
 import kotlin.math.abs
@@ -167,7 +168,7 @@ class FkCameraFeatures(val id: String, cc: CameraCharacteristics, ccExt: CameraE
                     Size(3264, 2448),
                     ImageFormat.JPEG
                 )?.apply {
-                    Log.i(TAG, "Capture latency ${lower}-${upper}")
+                    FkLogcat.i(TAG, "Capture latency ${lower}-${upper}")
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -214,9 +215,9 @@ class FkCameraFeatures(val id: String, cc: CameraCharacteristics, ccExt: CameraE
                 val sizes = map!!.getOutputSizes(cls)
                 if (sizes != null) {
                     sizeMap[cls] = sizes
-                    Log.i(TAG, "format=${cls.name}: ${sizes.contentToString()}")
+                    FkLogcat.i(TAG, "format=${cls.name}: ${sizes.contentToString()}")
                 } else {
-                    Log.w(TAG,  "format=${cls.name} sizes is empty.")
+                    FkLogcat.w(TAG,  "format=${cls.name} sizes is empty.")
                 }
             }
             return
@@ -224,7 +225,7 @@ class FkCameraFeatures(val id: String, cc: CameraCharacteristics, ccExt: CameraE
         if (map!!.isOutputSupportedFor(format)) {
             val sizes: Array<Size> = map!!.getOutputSizes(format)
             sizeMap[format] = sizes
-            Log.i(TAG,  "format=${format}: ${sizes.contentToString()}")
+            FkLogcat.i(TAG,  "format=${format}: ${sizes.contentToString()}")
         }
     }
 

@@ -11,6 +11,7 @@ import android.os.Build
 import android.os.Handler
 import android.util.Log
 import android.view.Surface
+import com.alimin.fk.utils.FkLogcat
 import java.util.concurrent.Executor
 
 class FkCameraExtSession(
@@ -29,19 +30,19 @@ class FkCameraExtSession(
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             val stateCallback = object : CameraExtensionSession.StateCallback() {
                 override fun onConfigured(session: CameraExtensionSession) {
-                    Log.i(TAG, "onConfigured")
+                    FkLogcat.i(TAG, "onConfigured")
                     this@FkCameraExtSession.session = session
                     callback.onConfigured(this@FkCameraExtSession)
                 }
 
                 override fun onConfigureFailed(session: CameraExtensionSession) {
-                    Log.i(TAG, "onConfigureFailed")
+                    FkLogcat.i(TAG, "onConfigureFailed")
                     callback.onConfigureFailed(this@FkCameraExtSession)
                 }
 
                 override fun onClosed(session: CameraExtensionSession) {
                     super.onClosed(session)
-                    Log.i(TAG, "onClosed")
+                    FkLogcat.i(TAG, "onClosed")
                     this@FkCameraExtSession.session = null
                 }
             }
@@ -100,7 +101,7 @@ class FkCameraExtSession(
     ) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
             session?.realtimeStillCaptureLatency?.let {
-                Log.i(TAG, "Capture latency ${it.captureLatency}, ${it.processingLatency}")
+                FkLogcat.i(TAG, "Capture latency ${it.captureLatency}, ${it.processingLatency}")
             }
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {

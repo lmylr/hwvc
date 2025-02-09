@@ -16,6 +16,11 @@ FK_IMPL_CLASS_TYPE(FkJniStringUTF8, FkObject)
 FkJniStringUTF8::FkJniStringUTF8(const std::string &str) : FkObject(), src(str) {
 }
 
+FkJniStringUTF8::FkJniStringUTF8(JNIEnv *env, jstring _str) {
+    this->_str = _str;
+    this->src = std::string(env->GetStringUTFChars(_str, nullptr));
+}
+
 FkJniStringUTF8::~FkJniStringUTF8() {
     JNIEnv *env = nullptr;
     if (_str && FkJavaRuntime::getInstance().findEnv(&env)) {
@@ -29,4 +34,8 @@ jstring FkJniStringUTF8::str() {
         _str = env->NewStringUTF(src.c_str());
     }
     return _str;
+}
+
+std::string FkJniStringUTF8::c_str() {
+    return src;
 }

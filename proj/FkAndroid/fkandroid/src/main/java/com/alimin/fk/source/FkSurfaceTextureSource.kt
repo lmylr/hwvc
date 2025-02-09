@@ -7,6 +7,7 @@ import android.util.Log
 import android.view.Surface
 import androidx.annotation.Keep
 import com.alimin.fk.core.FkAbsImageSource
+import com.alimin.fk.utils.FkLogcat
 import java.lang.Exception
 
 @Keep
@@ -45,7 +46,7 @@ class FkSurfaceTextureSource() : FkAbsImageSource() {
 
     @Synchronized
     fun destroy(): Int {
-        Log.i(TAG, "destroy")
+        FkLogcat.i(TAG, "destroy")
         reqDestroy = true
         _destroy()
         return 0
@@ -54,7 +55,7 @@ class FkSurfaceTextureSource() : FkAbsImageSource() {
     @Synchronized
     private fun _destroy() {
         if (reqDestroy && isDestroy) {
-            Log.i(TAG, "_destroy")
+            FkLogcat.i(TAG, "_destroy")
             surfaceTexture?.release()
             surfaceTexture = null
             surface?.release()
@@ -72,7 +73,7 @@ class FkSurfaceTextureSource() : FkAbsImageSource() {
     fun allocBuffer() {
         surfaceTexture?.setDefaultBufferSize(size.x, size.y)
         createFunc = this::onCreate
-        Log.i(TAG, "allocBuffer")
+        FkLogcat.i(TAG, "allocBuffer")
     }
 
     @Synchronized
@@ -84,7 +85,7 @@ class FkSurfaceTextureSource() : FkAbsImageSource() {
     fun getSurface(): Surface? = surface
 
     override fun onCreate(arg0: Int, arg1: Long, arg2: String?): Int {
-        Log.i(TAG, "onCreate tex=$arg0")
+        FkLogcat.i(TAG, "onCreate tex=$arg0")
         if (arg0 >= 0) {
             synchronized(this) {
                 try {
@@ -110,7 +111,7 @@ class FkSurfaceTextureSource() : FkAbsImageSource() {
     }
 
     override fun onDestroy(): Int {
-        Log.i(TAG, "onDestroy")
+        FkLogcat.i(TAG, "onDestroy")
         synchronized(this) {
             isDestroy = true
         }

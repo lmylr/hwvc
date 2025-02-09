@@ -1,6 +1,7 @@
 package com.alimin.fk.core
 
 import android.util.Log
+import com.alimin.fk.utils.FkLogcat
 import java.nio.ByteBuffer
 
 
@@ -20,7 +21,7 @@ abstract class FkAbsImageSource {
     fun getNativeHandle(): Long = handle
 
     protected fun finalize() {
-        Log.i("FkAbsImageSource", "${javaClass.name} finalize called")
+        FkLogcat.i("FkAbsImageSource", "${javaClass.name} finalize called")
         nativeDestroy(handle)
     }
 

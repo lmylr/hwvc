@@ -5,6 +5,8 @@
 #ifndef FKANDROID_FKJNIDEFINITION_H
 #define FKANDROID_FKJNIDEFINITION_H
 
+#include "FkJniStringUTF8.h"
+
 // #define FK_CLASS
 #define FK_JNI_METHOD_DEFINE(PKT, CLASS, METHOD) JNICALL Java_ ## PKT ## _ ## CLASS ## _ ## METHOD
 

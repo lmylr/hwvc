@@ -14,8 +14,6 @@ import android.media.ImageReader
 import android.os.Build
 import android.os.Handler
 import android.os.HandlerThread
-import android.os.Looper
-import android.util.Log
 import android.util.Size
 import android.view.Surface
 import com.alimin.fk.core.FkAbsImageSource
@@ -28,6 +26,7 @@ import com.alimin.fk.source.FkCompressedImageSource
 import com.alimin.fk.source.FkSurfaceTextureSource
 import com.alimin.fk.source.FkYUV420SPImageSource
 import com.alimin.fk.utils.FkCaptureReqUtils
+import com.alimin.fk.utils.FkLogcat
 import java.util.LinkedList
 
 
@@ -57,7 +56,7 @@ class FkCamera2(private val manager: CameraManager) : FkAbsCamera() {
 
     @Synchronized
     override fun create(): Int {
-        Log.i(TAG, "create")
+        FkLogcat.i(TAG, "create")
         thread = HandlerThread(TAG)
         thread.start()
         handler = Handler(thread.looper)
@@ -71,7 +70,7 @@ class FkCamera2(private val manager: CameraManager) : FkAbsCamera() {
                 val features = FkCameraFeatures(it, manager.getCameraCharacteristics(it!!), ccExt)
                 if (features.facing !== FkCameraFeatures.kFacing.Unknown) {
                     featuresList.add(features)
-                    Log.i(TAG, "Query camera features: $features")
+                    FkLogcat.i(TAG, "Query camera features: $features")
                 }
             }
         } catch (e: CameraAccessException) {
@@ -83,7 +82,7 @@ class FkCamera2(private val manager: CameraManager) : FkAbsCamera() {
 
     @Synchronized
     override fun destroy(): Int {
-        Log.i(TAG, "destroy")
+        FkLogcat.i(TAG, "destroy")
         filledFeatures = false
         featuresList.clear()
         surfaceSource.destroy()
@@ -95,7 +94,7 @@ class FkCamera2(private val manager: CameraManager) : FkAbsCamera() {
     @SuppressLint("MissingPermission")
     @Synchronized
     override fun start(settings: FkCameraSettings): Int {
-        Log.i(TAG, "start")
+        FkLogcat.i(TAG, "start")
         this.cameraSettings = settings
         featuresList.filter { it.facing == settings.facing }.let {
             curFeatures = it[0]
@@ -109,14 +108,14 @@ class FkCamera2(private val manager: CameraManager) : FkAbsCamera() {
             } else if (curFeatures!!.facing == FkCameraFeatures.kFacing.Front) {
                 surfaceSource.setScale(1f, -1f)
             }
-            Log.i(TAG, "Select camera ${curFeatures!!.id}")
+            FkLogcat.i(TAG, "Select camera ${curFeatures!!.id}")
         }
         if (curFeatures == null) {
-            Log.e(TAG, "Camera feature not found!")
+            FkLogcat.e(TAG, "Camera feature not found!")
             return -1
         }
         this.curExpMetadata = null
-        Log.i(TAG, "Preview size ${settings.previewSize.width}x${settings.previewSize.height} -> ${previewSize.width}x${previewSize.height}")
+        FkLogcat.i(TAG, "Preview size ${settings.previewSize.width}x${settings.previewSize.height} -> ${previewSize.width}x${previewSize.height}")
         surfaceSource.setSize(previewSize.width, previewSize.height)
         try {
             manager.openCamera(curFeatures!!.id, deviceStateCallback, handler)
@@ -129,7 +128,7 @@ class FkCamera2(private val manager: CameraManager) : FkAbsCamera() {
 
     @Synchronized
     override fun stop(): Int {
-        Log.i(TAG, "stop")
+        FkLogcat.i(TAG, "stop")
         state = FkCameraState.STOPPING
         closeCaptureSession()
         cameraDevice?.close()
@@ -139,7 +138,7 @@ class FkCamera2(private val manager: CameraManager) : FkAbsCamera() {
     override fun getImageSource(): FkAbsImageSource = surfaceSource
     override fun capture(listener: OnCaptureListener): Int {
         if (cameraDevice == null) {
-            Log.e(TAG, "Camera device is null")
+            FkLogcat.e(TAG, "Camera device is null")
             return -1
         }
         val callback = object : FkAbsCameraSession.CaptureCallback {
@@ -149,7 +148,7 @@ class FkCamera2(private val manager: CameraManager) : FkAbsCamera() {
                 result: TotalCaptureResult
             ) {
                 val metadata = FkCaptureMetadata(result)
-                Log.i(TAG, "onCaptureCompleted capture: ${metadata}")
+                FkLogcat.i(TAG, "onCaptureCompleted capture: ${metadata}")
             }
         }
         try {
@@ -162,15 +161,15 @@ class FkCamera2(private val manager: CameraManager) : FkAbsCamera() {
                 set(CaptureRequest.JPEG_ORIENTATION, if (isFacingBack) 90 else 270)
                 FkCaptureReqUtils.withBasicParams(this)
                 val metadata = latestPrevMetadata?.getSuggestMetadataByISOFirst(curFeatures!!.isoRange)
-                Log.d(TAG, "Preview metadata: ${latestPrevMetadata}")
-                Log.d(TAG, "Capture metadata: ${metadata}, fpsRange=$fpsRange")
+                FkLogcat.d(TAG, "Preview metadata: ${latestPrevMetadata}")
+                FkLogcat.d(TAG, "Capture metadata: ${metadata}, fpsRange=$fpsRange")
 //                if (metadata?.ISO!! <= 400) {
                 if (metadata?.ISO!! <= -1) {
                     FkCaptureReqUtils.withManualRequest(this, metadata)
-                    Log.d(TAG, "Capture with manual mode")
+                    FkLogcat.d(TAG, "Capture with manual mode")
                 } else {
                     FkCaptureReqUtils.withAutoRequest(this)
-                    Log.d(TAG, "Capture with auto mode")
+                    FkLogcat.d(TAG, "Capture with auto mode")
                 }
                 FkCaptureReqUtils.withFaceAE(this, metadata, previewSize)
                 FkCaptureReqUtils.withHighQuality(this)
@@ -178,7 +177,7 @@ class FkCamera2(private val manager: CameraManager) : FkAbsCamera() {
             }
             captureSession?.capture(request.build(), callback, handler)
         } catch (e: Exception) {
-            Log.e(TAG, "Create still capture request with exception: $e");
+            FkLogcat.e(TAG, "Create still capture request with exception: $e");
             return -1
         }
         captureListenerQueue.offer(listener)
@@ -190,7 +189,7 @@ class FkCamera2(private val manager: CameraManager) : FkAbsCamera() {
             val scale = 1 - Math.sin(curExpValue * Math.PI / 2 / 100)
             if (FkCaptureReqUtils.isManualExposure(this) && curExpMetadata != null) {
                 val metadata = curExpMetadata!!.getNextMetadataByISOFirst(curFeatures!!.isoRange, curFeatures!!.exposureTimeRange, curExpValue, scale, 80)
-                Log.i(TAG, "exposure_value exp=$curExpValue, scale=$scale, ${metadata.ISO}/${metadata.exposureTime}")
+                FkLogcat.i(TAG, "exposure_value exp=$curExpValue, scale=$scale, ${metadata.ISO}/${metadata.exposureTime}")
                 if ((metadata.ISO != curExpMetadata!!.ISO || metadata.exposureTime != curExpMetadata!!.exposureTime)
                     && latestPrevMetadata!!.ISO == curExpMetadata!!.ISO
                     && latestPrevMetadata!!.exposureTime == curExpMetadata!!.exposureTime
@@ -206,7 +205,7 @@ class FkCamera2(private val manager: CameraManager) : FkAbsCamera() {
     }
 
     private fun closeCaptureSession() {
-        Log.i(TAG, "closeCaptureSession")
+        FkLogcat.i(TAG, "closeCaptureSession")
         captureSession?.let {
             try {
 //                it.abortCaptures()
@@ -221,7 +220,7 @@ class FkCamera2(private val manager: CameraManager) : FkAbsCamera() {
     }
 
     private fun openCaptureSession() {
-        Log.i(TAG, "openCaptureSession")
+        FkLogcat.i(TAG, "openCaptureSession")
         surfaceSource.allocBuffer()
         val surfaces: MutableList<Surface> = ArrayList()
         surfaceSource.getSurface()?.let {
@@ -242,10 +241,10 @@ class FkCamera2(private val manager: CameraManager) : FkAbsCamera() {
 
             }
             captureSession = if (cameraSettings.reqCameraKeys.find { it.equals(FkCameraAvailableKey.SCENE_AUTO_EXT) } != null) {
-                Log.i(TAG, "Create ext session")
+                FkLogcat.i(TAG, "Create ext session")
                 FkCameraExtSession(cameraDevice, surfaces, handler, callback)
             } else {
-                Log.i(TAG, "Create session")
+                FkLogcat.i(TAG, "Create session")
                 FkCameraSession(cameraDevice, surfaces, handler, callback)
             }
         } catch (e: CameraAccessException) {
@@ -254,7 +253,7 @@ class FkCamera2(private val manager: CameraManager) : FkAbsCamera() {
     }
 
     private fun startPreview() {
-        Log.i(TAG, "startPreview")
+        FkLogcat.i(TAG, "startPreview")
         try {
             mPreviewReqBuilder = cameraDevice?.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW)
             mPreviewReqBuilder?.apply {
@@ -277,7 +276,7 @@ class FkCamera2(private val manager: CameraManager) : FkAbsCamera() {
     }
 
     private fun updatePreview() {
-        Log.i(TAG, "updatePreview")
+        FkLogcat.i(TAG, "updatePreview")
         try {
             mPreviewReqBuilder?.apply {
                 captureSession?.stopRepeating()
@@ -338,7 +337,7 @@ class FkCamera2(private val manager: CameraManager) : FkAbsCamera() {
             pictureSize = jpegSize
             format = ImageFormat.JPEG
         }
-        Log.i(TAG, "Picture size ${cameraSettings.pictureSize.width}x${cameraSettings.pictureSize.height} -> ${pictureSize.width}x${pictureSize.height}, format=$format")
+        FkLogcat.i(TAG, "Picture size ${cameraSettings.pictureSize.width}x${cameraSettings.pictureSize.height} -> ${pictureSize.width}x${pictureSize.height}, format=$format")
         val reader = ImageReader.newInstance(
             pictureSize.width,
             pictureSize.height,
@@ -350,7 +349,7 @@ class FkCamera2(private val manager: CameraManager) : FkAbsCamera() {
                 if (image != null) {
                     val format = image.format
                     val timestamp = image.timestamp
-                    Log.i(TAG, "Get picture ${image.width}x${image.height}, format=${format}, timestamp=${timestamp}")
+                    FkLogcat.i(TAG, "Get picture ${image.width}x${image.height}, format=${format}, timestamp=${timestamp}")
                     captureListenerQueue.poll()?.onResult(createImageSource(reader, image))
                     image.close()
                 }
@@ -380,7 +379,7 @@ class FkCamera2(private val manager: CameraManager) : FkAbsCamera() {
         }
         filledFeatures = true
         val msg = "Fill features finish."
-        Log.i(TAG, "[OK] $msg")
+        FkLogcat.i(TAG, "[OK] $msg")
         dispatchInfo(FkResult.INFO_CAMERA_FILL_FEATURES_FINISH, 0, null)
     }
 
@@ -394,7 +393,7 @@ class FkCamera2(private val manager: CameraManager) : FkAbsCamera() {
             if (curExpMetadata == null) {
                 curExpMetadata = FkCaptureMetadata(result)
             }
-            Log.d(TAG, "onCaptureCompleted preview: ${latestPrevMetadata!!.ISO}, ${latestPrevMetadata!!.exposureTime}")
+            FkLogcat.d(TAG, "onCaptureCompleted preview: ${latestPrevMetadata!!.ISO}, ${latestPrevMetadata!!.exposureTime}")
             _fillFeatures()
         }
     }
@@ -402,7 +401,7 @@ class FkCamera2(private val manager: CameraManager) : FkAbsCamera() {
     private val deviceStateCallback = object : CameraDevice.StateCallback() {
 
         override fun onOpened(camera: CameraDevice) {
-            Log.i(TAG, "onOpened")
+            FkLogcat.i(TAG, "onOpened")
             synchronized(cameraDeviceLock) {
                 cameraDevice = camera
             }
@@ -410,19 +409,19 @@ class FkCamera2(private val manager: CameraManager) : FkAbsCamera() {
         }
 
         override fun onDisconnected(camera: CameraDevice) {
-            Log.i(TAG, "onDisconnected")
+            FkLogcat.i(TAG, "onDisconnected")
             closeCaptureSession()
         }
 
         override fun onError(camera: CameraDevice, error: Int) {
-            Log.i(TAG, "onError error=$error")
+            FkLogcat.i(TAG, "onError error=$error")
             synchronized(cameraDeviceLock) {
                 cameraDevice = null
             }
         }
 
         override fun onClosed(camera: CameraDevice) {
-            Log.i(TAG, "CameraDevice onClosed")
+            FkLogcat.i(TAG, "CameraDevice onClosed")
             super.onClosed(camera)
             synchronized(cameraDeviceLock) {
                 cameraDevice = null

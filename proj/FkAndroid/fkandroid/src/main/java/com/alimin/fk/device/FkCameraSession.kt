@@ -8,6 +8,7 @@ import android.hardware.camera2.TotalCaptureResult
 import android.os.Handler
 import android.util.Log
 import android.view.Surface
+import com.alimin.fk.utils.FkLogcat
 
 class FkCameraSession(
     cameraDevice: CameraDevice?,
@@ -24,18 +25,18 @@ class FkCameraSession(
         try {
             cameraDevice?.createCaptureSession(surfaces, object: CameraCaptureSession.StateCallback() {
                 override fun onConfigured(session: CameraCaptureSession) {
-                    Log.i(TAG, "onConfigured")
+                    FkLogcat.i(TAG, "onConfigured")
                     this@FkCameraSession.session = session
                     callback.onConfigured(this@FkCameraSession)
                 }
 
                 override fun onConfigureFailed(session: CameraCaptureSession) {
-                    Log.e(TAG, "onConfigureFailed")
+                    FkLogcat.e(TAG, "onConfigureFailed")
                     callback.onConfigureFailed(this@FkCameraSession)
                 }
 
                 override fun onSurfacePrepared(session: CameraCaptureSession, surface: Surface) {
-                    Log.e(TAG, "onSurfacePrepared")
+                    FkLogcat.e(TAG, "onSurfacePrepared")
                     super.onSurfacePrepared(session, surface)
                 }
 

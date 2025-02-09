@@ -20,11 +20,15 @@ FK_DEF_CLASS_TYPE_FUNC(FkJniStringUTF8)
 public:
     FkJniStringUTF8(const std::string &str);
 
+    FkJniStringUTF8(JNIEnv *env, jstring _str);
+
     FkJniStringUTF8(const FkJniStringUTF8 &o) = delete;
 
     virtual ~FkJniStringUTF8();
 
     jstring str();
+
+    std::string c_str();
 
 private:
     std::string src = "";

@@ -11,6 +11,7 @@ import android.os.Message
 import android.util.Log
 import com.alimin.fk.entity.FkAudioSettings
 import com.alimin.fk.entity.FkResult
+import com.alimin.fk.utils.FkLogcat
 import java.io.File
 import java.io.FileOutputStream
 import java.lang.Exception
@@ -53,7 +54,7 @@ open class FkMicrophone : FkDevice() {
                         bos?.write(mByteBuffer!!.array(), 0, size)
                         continue
                     }
-                    Log.i(TAG, "Delta: $delta")
+                    FkLogcat.i(TAG, "Delta: $delta")
                     val deltaSize = delta * settings!!.channels * settings!!.sampleRate * settings!!.channels * (settings!!.format / 8) / 1000000000
                     if (deltaSize > 0) {
                         fixed = true
@@ -75,13 +76,13 @@ open class FkMicrophone : FkDevice() {
                     )
                 }
             }
-//            Log.i(TAG, "Read: ${timestamp.nanoTime}/${System.nanoTime()}, ${timestamp.framePosition}, $size")
+//            FkLogcat.i(TAG, "Read: ${timestamp.nanoTime}/${System.nanoTime()}, ${timestamp.framePosition}, $size")
         }
-        Log.i(TAG, "Stop record loop")
+        FkLogcat.i(TAG, "Stop record loop")
     }
 
     fun init(settings: FkAudioSettings, path: String): FkResult {
-        Log.e(TAG, "Path: $path")
+        FkLogcat.e(TAG, "Path: $path")
         this.settings = settings
         val sampleRate = settings.sampleRate
         val channelConfig = if (1 == settings.channels) AudioFormat.CHANNEL_IN_MONO
@@ -121,7 +122,7 @@ open class FkMicrophone : FkDevice() {
 
     fun start(): FkResult {
         if (AudioRecord.STATE_INITIALIZED != mRecord.recordingState) {
-            Log.e(TAG, "Invalid state: ${mRecord.recordingState}")
+            FkLogcat.e(TAG, "Invalid state: ${mRecord.recordingState}")
             return FkResult.INVALID_STATE
         }
         try {
@@ -129,7 +130,7 @@ open class FkMicrophone : FkDevice() {
             strategy?.nearTimestampInNano = Long.MIN_VALUE
             mRecord.startRecording()
             if (AudioRecord.RECORDSTATE_RECORDING != mRecord.recordingState) {
-                Log.e(TAG, "Start failed. Invalid state: ${mRecord.recordingState}")
+                FkLogcat.e(TAG, "Start failed. Invalid state: ${mRecord.recordingState}")
                 return FkResult.INVALID_STATE
             }
             mHandler?.sendEmptyMessage(1)
@@ -142,7 +143,7 @@ open class FkMicrophone : FkDevice() {
 
     fun stop(): FkResult {
         if (AudioRecord.RECORDSTATE_RECORDING != mRecord.recordingState) {
-            Log.e(TAG, "Invalid state: ${mRecord.recordingState}")
+            FkLogcat.e(TAG, "Invalid state: ${mRecord.recordingState}")
             return FkResult.INVALID_STATE
         }
         try {
@@ -157,7 +158,7 @@ open class FkMicrophone : FkDevice() {
     fun release(): FkResult {
         stop()
         if (AudioRecord.RECORDSTATE_STOPPED != mRecord.recordingState) {
-            Log.e(TAG, "Invalid state: ${mRecord.recordingState}")
+            FkLogcat.e(TAG, "Invalid state: ${mRecord.recordingState}")
             return FkResult.INVALID_STATE
         }
         mThread.quitSafely()
