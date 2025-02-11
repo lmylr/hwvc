@@ -136,7 +136,8 @@ class FkCamera2(private val manager: CameraManager) : FkAbsCamera() {
     }
 
     override fun getImageSource(): FkAbsImageSource = surfaceSource
-    override fun capture(listener: OnCaptureListener): Int {
+
+    override fun takePicture(listener: OnCaptureListener): Int {
         if (cameraDevice == null) {
             FkLogcat.e(TAG, "Camera device is null")
             return -1
@@ -183,6 +184,8 @@ class FkCamera2(private val manager: CameraManager) : FkAbsCamera() {
         captureListenerQueue.offer(listener)
         return 0
     }
+
+    override fun getFeatures(): List<FkCameraFeatures> = featuresList
 
     override fun updateExposure(curExpValue: Int): Int {
         mPreviewReqBuilder?.apply {

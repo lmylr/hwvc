@@ -172,7 +172,7 @@ class MainActivity : FlutterActivity(), MethodChannel.MethodCallHandler, Texture
             }
             "capture" -> {
                 val handle = arguments["handle"] as Int
-                camera?.capture(object : OnCaptureListener {
+                camera?.takePicture(object : OnCaptureListener {
                     override fun onResult(source: FkAbsImageSource?) {
                         if (source == null) {
                             result.error("-1", "Capture fail", null)
