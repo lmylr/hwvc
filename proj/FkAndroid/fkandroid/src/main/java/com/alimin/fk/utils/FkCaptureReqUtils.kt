@@ -8,6 +8,9 @@ import android.hardware.camera2.params.MeteringRectangle
 import android.os.Build
 import android.util.Range
 import android.util.Size
+import com.alimin.fk.entity.FkCameraAvailableKey
+import com.alimin.fk.entity.FkCameraFeatures
+import com.alimin.fk.entity.FkCameraSettings
 import com.alimin.fk.entity.FkCaptureMetadata
 import kotlin.math.ln
 import kotlin.math.pow
@@ -212,6 +215,10 @@ class FkCaptureReqUtils {
 //            ln(expTime) = ln(100 * aperture.toDouble().pow(2.0)) - ev * ln(2.0) - ln(iso)
             val expTime = Math.E.pow(ln(100 * aperture.toDouble().pow(2.0)) - ev * ln(2.0) - ln(iso.toDouble())) * 1000000000
             return expTime.toLong()
+        }
+
+        fun containsFeatureKey(features: FkCameraFeatures?, settings: FkCameraSettings?, key: FkCameraAvailableKey): Boolean {
+            return features?.contain(key) == true && settings?.reqCameraKeys?.contains(key) == true
         }
     }
 }

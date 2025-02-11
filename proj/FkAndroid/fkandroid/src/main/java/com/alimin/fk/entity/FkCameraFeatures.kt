@@ -2,19 +2,16 @@ package com.alimin.fk.entity
 
 import android.graphics.ImageFormat
 import android.graphics.Point
-import android.graphics.PointF
 import android.graphics.SurfaceTexture
 import android.hardware.camera2.CameraCharacteristics
 import android.hardware.camera2.CameraExtensionCharacteristics
 import android.hardware.camera2.CameraMetadata
 import android.hardware.camera2.params.StreamConfigurationMap
 import android.os.Build
-import android.util.Log
 import android.util.Range
 import android.util.Size
 import android.view.Surface
 import com.alimin.fk.utils.FkLogcat
-import java.util.Arrays
 import java.util.HashMap
 import kotlin.math.abs
 
@@ -31,6 +28,10 @@ data class FkCameraAvailableKey(val key: Int, val desc: String) {
         val SCENE_FACE_RETOUCH_EXT_POST_VIEW = FkCameraAvailableKey(0x9, "Face retouch extend scene placeholder")
         val SCENE_AUTO_EXT_POST_VIEW = FkCameraAvailableKey(0xA, "Auto extend scene placeholder")
         val SCENE_CROP_RAW = FkCameraAvailableKey(0xB, "Crop raw")
+        val AE_MODE_AUTO = FkCameraAvailableKey(0x10, "Exposure auto")
+        val AE_MODE_OFF = FkCameraAvailableKey(0x11, "Exposure off")
+        val AE_MODE_ISO_FIRST = FkCameraAvailableKey(0x12, "Exposure auto iso first")
+        val AE_MODE_TIME_FIRST = FkCameraAvailableKey(0x13, "Exposure auto time first")
     }
 
     override fun equals(other: Any?): Boolean {
@@ -39,6 +40,10 @@ data class FkCameraAvailableKey(val key: Int, val desc: String) {
         } else {
             return false
         }
+    }
+
+    override fun hashCode(): Int {
+        return key
     }
 }
 
@@ -108,6 +113,14 @@ class FkCameraFeatures(val id: String, cc: CameraCharacteristics, ccExt: CameraE
         this.maxFrameDuration = cc.get(CameraCharacteristics.SENSOR_INFO_MAX_FRAME_DURATION) ?: 0L
         this.maxAERegions = cc.get(CameraCharacteristics.CONTROL_MAX_REGIONS_AE) ?: 0
         this.maxAFRegions = cc.get(CameraCharacteristics.CONTROL_MAX_REGIONS_AF) ?: 0
+        _fillDefaultAvailableKeys()
+    }
+
+    private fun _fillDefaultAvailableKeys() {
+        _addAvailableKey(FkCameraAvailableKey.AE_MODE_AUTO)
+        _addAvailableKey(FkCameraAvailableKey.AE_MODE_OFF)
+        _addAvailableKey(FkCameraAvailableKey.AE_MODE_ISO_FIRST)
+        _addAvailableKey(FkCameraAvailableKey.AE_MODE_TIME_FIRST)
     }
 
     fun fill(cc: CameraCharacteristics, ccExt: CameraExtensionCharacteristics?) {

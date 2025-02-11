@@ -188,7 +188,11 @@ class FkCamera2(private val manager: CameraManager) : FkAbsCamera() {
         mPreviewReqBuilder?.apply {
             val scale = 1 - Math.sin(curExpValue * Math.PI / 2 / 100)
             if (FkCaptureReqUtils.isManualExposure(this) && curExpMetadata != null) {
-                val metadata = curExpMetadata!!.getNextMetadataByISOFirst(curFeatures!!.isoRange, curFeatures!!.exposureTimeRange, curExpValue, scale, 80)
+                val metadata = if (FkCaptureReqUtils.containsFeatureKey(curFeatures, cameraSettings, FkCameraAvailableKey.AE_MODE_ISO_FIRST)) {
+                    curExpMetadata!!.getNextMetadataByISOFirst(curFeatures!!.isoRange, curFeatures!!.exposureTimeRange, curExpValue, scale, 80)
+                } else {
+                    curExpMetadata!!
+                }
                 FkLogcat.i(TAG, "exposure_value exp=$curExpValue, scale=$scale, ${metadata.ISO}/${metadata.exposureTime}")
                 if ((metadata.ISO != curExpMetadata!!.ISO || metadata.exposureTime != curExpMetadata!!.exposureTime)
                     && latestPrevMetadata!!.ISO == curExpMetadata!!.ISO
@@ -263,7 +267,11 @@ class FkCamera2(private val manager: CameraManager) : FkAbsCamera() {
 
                 val fpsRange = curFeatures!!.getMaxDiffFpsRange()
                 FkCaptureReqUtils.withFpsRange(this, fpsRange)
-                FkCaptureReqUtils.withManualRequest(this, curFeatures!!.isoRange.lower, 10000000)
+                if (FkCaptureReqUtils.containsFeatureKey(curFeatures, cameraSettings, FkCameraAvailableKey.AE_MODE_AUTO)) {
+                    FkCaptureReqUtils.withAutoRequest(this)
+                } else {
+                    FkCaptureReqUtils.withManualRequest(this, curFeatures!!.isoRange.lower, 10000000)
+                }
                 set(
                     CaptureRequest.CONTROL_AF_MODE,
                     CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_VIDEO
