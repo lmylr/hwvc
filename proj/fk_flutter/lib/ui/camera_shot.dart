@@ -10,9 +10,10 @@ import 'package:fk_flutter/fk/plugin/fk_image_hist_plugin.dart';
 class CameraShotPage extends StatefulWidget {
   final FkImageEngine _editor;
   final VoidCallback _onClosed;
+  final bool showCloseButton;
   final ValueChanged<int> _onCaptureDone;
 
-  const CameraShotPage(this._editor, this._onClosed, this._onCaptureDone, {super.key});
+  const CameraShotPage(this._editor, this.showCloseButton, this._onClosed, this._onCaptureDone, {super.key});
 
   @override
   State<CameraShotPage> createState() => _CameraShotPageState();
@@ -195,22 +196,25 @@ class _CameraShotPageState extends State<CameraShotPage>
                   iconSize: 40,
                 ),
               )),
-          Align(
-              alignment: Alignment.topLeft,
-              child: Container(
-                child: IconButton(
-                  onPressed: () {
-                    _captureCancel();
-                    _closeCamera().then((ret) {
-                      widget._onClosed();
-                    });
-                  },
-                  style: ButtonStyle(
-                      padding: MaterialStateProperty.all(EdgeInsets.all(8))),
-                  icon: Icon(Icons.close, color: Colors.white),
-                  iconSize: 40,
-                ),
-              )),
+          widget.showCloseButton
+              ? Align(
+                  alignment: Alignment.topLeft,
+                  child: Container(
+                    child: IconButton(
+                      onPressed: () {
+                        _captureCancel();
+                        _closeCamera().then((ret) {
+                          widget._onClosed();
+                        });
+                      },
+                      style: ButtonStyle(
+                          padding:
+                              MaterialStateProperty.all(EdgeInsets.all(8))),
+                      icon: Icon(Icons.close, color: Colors.white),
+                      iconSize: 40,
+                    ),
+                  ))
+              : Container(),
         ],
       ),
     );

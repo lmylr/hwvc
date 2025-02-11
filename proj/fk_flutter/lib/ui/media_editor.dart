@@ -14,7 +14,7 @@ import 'package:fk_flutter/fk/plugin/fk_color_adjust_plugin.dart';
 import 'package:fk_flutter/fk/entity/FkValue.dart';
 
 class MediaEditorPage extends StatefulWidget {
-  const MediaEditorPage({super.key, required this.title, required this.fixedCameraPage});
+  const MediaEditorPage(this.fixedCameraPage, {super.key, required this.title});
 
   final String title;
   final bool fixedCameraPage;
@@ -156,13 +156,10 @@ class _MediaEditorPageState extends State<MediaEditorPage> with WidgetsBindingOb
         backgroundColor: Colors.transparent,
         body: CameraShotPage(
           _editor,
+          !widget.fixedCameraPage,
           () {
-            if (!widget.fixedCameraPage) {
-              _layerState = LayerState.idle;
-              _checkEmptyLayers();
-            } else {
-
-            }
+            _layerState = LayerState.idle;
+            _checkEmptyLayers();
           },
           (layerId) {
             _layerState = LayerState.idle;

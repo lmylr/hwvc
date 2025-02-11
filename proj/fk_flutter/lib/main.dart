@@ -24,7 +24,7 @@ class MyApp extends StatelessWidget {
         ),
         useMaterial3: true,
       ),
-      home: const MediaEditorPage(title: '编辑', fixedCameraPage: true),
+      home: const MediaEditorPage(true, title: '编辑'),
     );
   }
 }
