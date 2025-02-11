@@ -15,27 +15,27 @@ import com.alimin.fk.utils.FkLogcat
 import java.util.HashMap
 import kotlin.math.abs
 
-data class FkCameraAvailableKey(val key: Int, val desc: String) {
+data class FkCameraFeatureKey(val key: Int, val desc: String) {
     companion object {
-        val SCENE_NIGHT_EXT = FkCameraAvailableKey(0x1, "Night extend scene")
-        val SCENE_HDR_EXT = FkCameraAvailableKey(0x2, "HDR extend scene")
-        val SCENE_BOKEH_EXT = FkCameraAvailableKey(0x3, "Person bokeh extend scene")
-        val SCENE_FACE_RETOUCH_EXT = FkCameraAvailableKey(0x4, "Face retouch extend scene")
-        val SCENE_AUTO_EXT = FkCameraAvailableKey(0x5, "Auto extend scene")
-        val SCENE_NIGHT_EXT_POST_VIEW = FkCameraAvailableKey(0x6, "Auto extend placeholder")
-        val SCENE_HDR_EXT_POST_VIEW = FkCameraAvailableKey(0x7, "HDR extend scene placeholder")
-        val SCENE_BOKEH_EXT_POST_VIEW = FkCameraAvailableKey(0x8, "Person bokeh extend scene placeholder")
-        val SCENE_FACE_RETOUCH_EXT_POST_VIEW = FkCameraAvailableKey(0x9, "Face retouch extend scene placeholder")
-        val SCENE_AUTO_EXT_POST_VIEW = FkCameraAvailableKey(0xA, "Auto extend scene placeholder")
-        val SCENE_CROP_RAW = FkCameraAvailableKey(0xB, "Crop raw")
-        val AE_MODE_AUTO = FkCameraAvailableKey(0x10, "Exposure auto")
-        val AE_MODE_OFF = FkCameraAvailableKey(0x11, "Exposure off")
-        val AE_MODE_ISO_FIRST = FkCameraAvailableKey(0x12, "Exposure auto iso first")
-        val AE_MODE_TIME_FIRST = FkCameraAvailableKey(0x13, "Exposure auto time first")
+        val SCENE_NIGHT_EXT = FkCameraFeatureKey(0x1, "Night extend scene")
+        val SCENE_HDR_EXT = FkCameraFeatureKey(0x2, "HDR extend scene")
+        val SCENE_BOKEH_EXT = FkCameraFeatureKey(0x3, "Person bokeh extend scene")
+        val SCENE_FACE_RETOUCH_EXT = FkCameraFeatureKey(0x4, "Face retouch extend scene")
+        val SCENE_AUTO_EXT = FkCameraFeatureKey(0x5, "Auto extend scene")
+        val SCENE_NIGHT_EXT_POST_VIEW = FkCameraFeatureKey(0x6, "Auto extend placeholder")
+        val SCENE_HDR_EXT_POST_VIEW = FkCameraFeatureKey(0x7, "HDR extend scene placeholder")
+        val SCENE_BOKEH_EXT_POST_VIEW = FkCameraFeatureKey(0x8, "Person bokeh extend scene placeholder")
+        val SCENE_FACE_RETOUCH_EXT_POST_VIEW = FkCameraFeatureKey(0x9, "Face retouch extend scene placeholder")
+        val SCENE_AUTO_EXT_POST_VIEW = FkCameraFeatureKey(0xA, "Auto extend scene placeholder")
+        val SCENE_CROP_RAW = FkCameraFeatureKey(0xB, "Crop raw")
+        val AE_MODE_AUTO = FkCameraFeatureKey(0x10, "Exposure auto")
+        val AE_MODE_OFF = FkCameraFeatureKey(0x11, "Exposure off")
+        val AE_MODE_ISO_FIRST = FkCameraFeatureKey(0x12, "Exposure auto iso first")
+        val AE_MODE_TIME_FIRST = FkCameraFeatureKey(0x13, "Exposure auto time first")
     }
 
     override fun equals(other: Any?): Boolean {
-        return if (other is FkCameraAvailableKey) {
+        return if (other is FkCameraFeatureKey) {
             return other.key == key
         } else {
             return false
@@ -74,7 +74,7 @@ class FkCameraFeatures(val id: String, cc: CameraCharacteristics, ccExt: CameraE
     private var map: StreamConfigurationMap? = null
     private val sizeMap: MutableMap<Any, Array<Size>> = HashMap()
     private var filled = false
-    val availableKeys = ArrayList<FkCameraAvailableKey>()
+    val availableKeys = ArrayList<FkCameraFeatureKey>()
 
     init {
         val face = cc.get(CameraCharacteristics.LENS_FACING)
@@ -117,10 +117,10 @@ class FkCameraFeatures(val id: String, cc: CameraCharacteristics, ccExt: CameraE
     }
 
     private fun _fillDefaultAvailableKeys() {
-        _addAvailableKey(FkCameraAvailableKey.AE_MODE_AUTO)
-        _addAvailableKey(FkCameraAvailableKey.AE_MODE_OFF)
-        _addAvailableKey(FkCameraAvailableKey.AE_MODE_ISO_FIRST)
-        _addAvailableKey(FkCameraAvailableKey.AE_MODE_TIME_FIRST)
+        _addAvailableKey(FkCameraFeatureKey.AE_MODE_AUTO)
+        _addAvailableKey(FkCameraFeatureKey.AE_MODE_OFF)
+        _addAvailableKey(FkCameraFeatureKey.AE_MODE_ISO_FIRST)
+        _addAvailableKey(FkCameraFeatureKey.AE_MODE_TIME_FIRST)
     }
 
     fun fill(cc: CameraCharacteristics, ccExt: CameraExtensionCharacteristics?) {
@@ -140,38 +140,38 @@ class FkCameraFeatures(val id: String, cc: CameraCharacteristics, ccExt: CameraE
             emptyList()
         }
         if (_isSupported(supportedExtensions, CameraExtensionCharacteristics.EXTENSION_NIGHT)) {
-            _addAvailableKey(FkCameraAvailableKey.SCENE_NIGHT_EXT)
+            _addAvailableKey(FkCameraFeatureKey.SCENE_NIGHT_EXT)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE
                 && ccExt?.isPostviewAvailable(CameraExtensionCharacteristics.EXTENSION_NIGHT) == true) {
-                _addAvailableKey(FkCameraAvailableKey.SCENE_NIGHT_EXT_POST_VIEW)
+                _addAvailableKey(FkCameraFeatureKey.SCENE_NIGHT_EXT_POST_VIEW)
             }
         }
         if (_isSupported(supportedExtensions, CameraExtensionCharacteristics.EXTENSION_HDR)) {
-            _addAvailableKey(FkCameraAvailableKey.SCENE_HDR_EXT)
+            _addAvailableKey(FkCameraFeatureKey.SCENE_HDR_EXT)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE
                 && ccExt?.isPostviewAvailable(CameraExtensionCharacteristics.EXTENSION_HDR) == true) {
-                _addAvailableKey(FkCameraAvailableKey.SCENE_HDR_EXT_POST_VIEW)
+                _addAvailableKey(FkCameraFeatureKey.SCENE_HDR_EXT_POST_VIEW)
             }
         }
         if (_isSupported(supportedExtensions, CameraExtensionCharacteristics.EXTENSION_BOKEH)) {
-            _addAvailableKey(FkCameraAvailableKey.SCENE_BOKEH_EXT)
+            _addAvailableKey(FkCameraFeatureKey.SCENE_BOKEH_EXT)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE
                 && ccExt?.isPostviewAvailable(CameraExtensionCharacteristics.EXTENSION_BOKEH) == true) {
-                _addAvailableKey(FkCameraAvailableKey.SCENE_BOKEH_EXT_POST_VIEW)
+                _addAvailableKey(FkCameraFeatureKey.SCENE_BOKEH_EXT_POST_VIEW)
             }
         }
         if (_isSupported(supportedExtensions, CameraExtensionCharacteristics.EXTENSION_FACE_RETOUCH)) {
-            _addAvailableKey(FkCameraAvailableKey.SCENE_FACE_RETOUCH_EXT)
+            _addAvailableKey(FkCameraFeatureKey.SCENE_FACE_RETOUCH_EXT)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE
                 && ccExt?.isPostviewAvailable(CameraExtensionCharacteristics.EXTENSION_FACE_RETOUCH) == true) {
-                _addAvailableKey(FkCameraAvailableKey.SCENE_FACE_RETOUCH_EXT_POST_VIEW)
+                _addAvailableKey(FkCameraFeatureKey.SCENE_FACE_RETOUCH_EXT_POST_VIEW)
             }
         }
         if (_isSupported(supportedExtensions, CameraExtensionCharacteristics.EXTENSION_AUTOMATIC)) {
-            _addAvailableKey(FkCameraAvailableKey.SCENE_AUTO_EXT)
+            _addAvailableKey(FkCameraFeatureKey.SCENE_AUTO_EXT)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE
                 && ccExt?.isPostviewAvailable(CameraExtensionCharacteristics.EXTENSION_AUTOMATIC) == true) {
-                _addAvailableKey(FkCameraAvailableKey.SCENE_AUTO_EXT_POST_VIEW)
+                _addAvailableKey(FkCameraFeatureKey.SCENE_AUTO_EXT_POST_VIEW)
             }
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
@@ -191,12 +191,12 @@ class FkCameraFeatures(val id: String, cc: CameraCharacteristics, ccExt: CameraE
             val cases = cc.get(CameraCharacteristics.SCALER_AVAILABLE_STREAM_USE_CASES)
             val key = CameraMetadata.SCALER_AVAILABLE_STREAM_USE_CASES_CROPPED_RAW.toLong()
             if (_isSupported(cases, key)) {
-                _addAvailableKey(FkCameraAvailableKey.SCENE_CROP_RAW)
+                _addAvailableKey(FkCameraFeatureKey.SCENE_CROP_RAW)
             }
         }
     }
 
-    private fun _addAvailableKey(key: FkCameraAvailableKey) {
+    private fun _addAvailableKey(key: FkCameraFeatureKey) {
         availableKeys.add(key)
     }
 
@@ -298,7 +298,7 @@ class FkCameraFeatures(val id: String, cc: CameraCharacteristics, ccExt: CameraE
         return sb.toString()
     }
 
-    fun contain(key: FkCameraAvailableKey): Boolean {
+    fun contain(key: FkCameraFeatureKey): Boolean {
         return availableKeys.find { it.key == key.key } != null
     }
 

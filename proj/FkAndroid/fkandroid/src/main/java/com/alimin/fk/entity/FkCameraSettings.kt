@@ -6,9 +6,9 @@ data class FkCameraSettings(
     var facing: FkCameraFeatures.kFacing,
     var previewSize: Size,
     var pictureSize: Size,
-    val reqCameraKeys: MutableList<FkCameraAvailableKey> = ArrayList()
+    val reqFeatures: MutableList<FkCameraFeatureKey> = ArrayList()
 ) {
     init {
-        reqCameraKeys.add(FkCameraAvailableKey.AE_MODE_AUTO)
+        reqFeatures.add(FkCameraFeatureKey.AE_MODE_AUTO)
     }
 }

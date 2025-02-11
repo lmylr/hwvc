@@ -17,7 +17,7 @@ import android.os.HandlerThread
 import android.util.Size
 import android.view.Surface
 import com.alimin.fk.core.FkAbsImageSource
-import com.alimin.fk.entity.FkCameraAvailableKey
+import com.alimin.fk.entity.FkCameraFeatureKey
 import com.alimin.fk.entity.FkCameraFeatures
 import com.alimin.fk.entity.FkCameraSettings
 import com.alimin.fk.entity.FkCaptureMetadata
@@ -188,7 +188,7 @@ class FkCamera2(private val manager: CameraManager) : FkAbsCamera() {
         mPreviewReqBuilder?.apply {
             val scale = 1 - Math.sin(curExpValue * Math.PI / 2 / 100)
             if (FkCaptureReqUtils.isManualExposure(this) && curExpMetadata != null) {
-                val metadata = if (FkCaptureReqUtils.containsFeatureKey(curFeatures, cameraSettings, FkCameraAvailableKey.AE_MODE_ISO_FIRST)) {
+                val metadata = if (FkCaptureReqUtils.containsFeatureKey(curFeatures, cameraSettings, FkCameraFeatureKey.AE_MODE_ISO_FIRST)) {
                     curExpMetadata!!.getNextMetadataByISOFirst(curFeatures!!.isoRange, curFeatures!!.exposureTimeRange, curExpValue, scale, 80)
                 } else {
                     curExpMetadata!!
@@ -244,7 +244,7 @@ class FkCamera2(private val manager: CameraManager) : FkAbsCamera() {
                 }
 
             }
-            captureSession = if (cameraSettings.reqCameraKeys.find { it.equals(FkCameraAvailableKey.SCENE_AUTO_EXT) } != null) {
+            captureSession = if (cameraSettings.reqFeatures.find { it.equals(FkCameraFeatureKey.SCENE_AUTO_EXT) } != null) {
                 FkLogcat.i(TAG, "Create ext session")
                 FkCameraExtSession(cameraDevice, surfaces, handler, callback)
             } else {
@@ -267,7 +267,7 @@ class FkCamera2(private val manager: CameraManager) : FkAbsCamera() {
 
                 val fpsRange = curFeatures!!.getMaxDiffFpsRange()
                 FkCaptureReqUtils.withFpsRange(this, fpsRange)
-                if (FkCaptureReqUtils.containsFeatureKey(curFeatures, cameraSettings, FkCameraAvailableKey.AE_MODE_AUTO)) {
+                if (FkCaptureReqUtils.containsFeatureKey(curFeatures, cameraSettings, FkCameraFeatureKey.AE_MODE_AUTO)) {
                     FkCaptureReqUtils.withAutoRequest(this)
                 } else {
                     FkCaptureReqUtils.withManualRequest(this, curFeatures!!.isoRange.lower, 10000000)

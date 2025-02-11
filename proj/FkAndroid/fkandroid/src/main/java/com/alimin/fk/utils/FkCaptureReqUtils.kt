@@ -1,6 +1,5 @@
 package com.alimin.fk.utils
 
-import android.graphics.Rect
 import android.hardware.camera2.CaptureRequest
 import android.hardware.camera2.CaptureResult
 import android.hardware.camera2.TotalCaptureResult
@@ -8,7 +7,7 @@ import android.hardware.camera2.params.MeteringRectangle
 import android.os.Build
 import android.util.Range
 import android.util.Size
-import com.alimin.fk.entity.FkCameraAvailableKey
+import com.alimin.fk.entity.FkCameraFeatureKey
 import com.alimin.fk.entity.FkCameraFeatures
 import com.alimin.fk.entity.FkCameraSettings
 import com.alimin.fk.entity.FkCaptureMetadata
@@ -217,8 +216,8 @@ class FkCaptureReqUtils {
             return expTime.toLong()
         }
 
-        fun containsFeatureKey(features: FkCameraFeatures?, settings: FkCameraSettings?, key: FkCameraAvailableKey): Boolean {
-            return features?.contain(key) == true && settings?.reqCameraKeys?.contains(key) == true
+        fun containsFeatureKey(features: FkCameraFeatures?, settings: FkCameraSettings?, key: FkCameraFeatureKey): Boolean {
+            return features?.contain(key) == true && settings?.reqFeatures?.contains(key) == true
         }
     }
 }
