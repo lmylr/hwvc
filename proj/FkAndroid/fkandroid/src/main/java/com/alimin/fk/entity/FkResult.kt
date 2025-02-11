@@ -22,7 +22,8 @@ class FkResult(val code: Int, val msg: String = "") {
          **************** INFO ****************
          */
         val INFO_CAMERA_STOPPED = FkResult(1001, "Camera stopped")
-        val INFO_CAMERA_FILL_FEATURES_FINISH = FkResult(1002, "Fill features finish")
+        val INFO_CAMERA_FILL_SOME_FEATURES_FINISH = FkResult(1002, "Fill some features finish")
+        val INFO_CAMERA_FILL_ALL_FEATURES_FINISH = FkResult(1003, "Fill all features finish")
         val INFO_END = FkResult(9999, "Info end flag")
     }
 

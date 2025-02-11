@@ -73,6 +73,7 @@ class FkCamera2(private val manager: CameraManager) : FkAbsCamera() {
                     FkLogcat.i(TAG, "Query camera features: $features")
                 }
             }
+            dispatchInfo(FkResult.INFO_CAMERA_FILL_SOME_FEATURES_FINISH, 0, getFeatures())
         } catch (e: CameraAccessException) {
             e.printStackTrace()
         }
@@ -391,7 +392,7 @@ class FkCamera2(private val manager: CameraManager) : FkAbsCamera() {
         filledFeatures = true
         val msg = "Fill features finish."
         FkLogcat.i(TAG, "[OK] $msg")
-        dispatchInfo(FkResult.INFO_CAMERA_FILL_FEATURES_FINISH, 0, null)
+        dispatchInfo(FkResult.INFO_CAMERA_FILL_ALL_FEATURES_FINISH, 0, getFeatures())
     }
 
     private val previewCaptureCallback = object : FkAbsCameraSession.CaptureCallback {
