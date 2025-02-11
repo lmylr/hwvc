@@ -14,9 +14,10 @@ import 'package:fk_flutter/fk/plugin/fk_color_adjust_plugin.dart';
 import 'package:fk_flutter/fk/entity/FkValue.dart';
 
 class MediaEditorPage extends StatefulWidget {
-  const MediaEditorPage({super.key, required this.title});
+  const MediaEditorPage({super.key, required this.title, required this.fixedCameraPage});
 
   final String title;
+  final bool fixedCameraPage;
 
   @override
   State<MediaEditorPage> createState() => _MediaEditorPageState();
@@ -33,7 +34,7 @@ class _MediaEditorPageState extends State<MediaEditorPage> with WidgetsBindingOb
   late final Directory _workspace;
   late final FkImageEngine _editor;
   int _currentIndex = -1;
-  LayerState _layerState = LayerState.idle;
+  LayerState _layerState = LayerState.camera;
   Widget? curSecondPanel;
 
   @override
@@ -65,9 +66,11 @@ class _MediaEditorPageState extends State<MediaEditorPage> with WidgetsBindingOb
 
   void _checkEmptyLayers() {
     _editor.getLayerSize().then((size) => setState(() {
-      Logcat.debug('getLayerSize=$size');
+          Logcat.debug('_checkEmptyLayers getLayerSize=$size');
           if (size == 0) {
-            _layerState = LayerState.empty;
+            if (!widget.fixedCameraPage) {
+              _layerState = LayerState.empty;
+            }
           } else {
             if (_layerState != LayerState.camera) {
               _layerState = LayerState.editor;
@@ -154,8 +157,12 @@ class _MediaEditorPageState extends State<MediaEditorPage> with WidgetsBindingOb
         body: CameraShotPage(
           _editor,
           () {
-            _layerState = LayerState.idle;
-            _checkEmptyLayers();
+            if (!widget.fixedCameraPage) {
+              _layerState = LayerState.idle;
+              _checkEmptyLayers();
+            } else {
+
+            }
           },
           (layerId) {
             _layerState = LayerState.idle;
