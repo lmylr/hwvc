@@ -17,13 +17,14 @@ import android.os.HandlerThread
 import android.util.Size
 import android.view.Surface
 import com.alimin.fk.core.FkAbsImageSource
+import com.alimin.fk.core.FkAbsImageSource2
 import com.alimin.fk.entity.FkCameraFeatureKey
 import com.alimin.fk.entity.FkCameraFeatures
 import com.alimin.fk.entity.FkCameraSettings
 import com.alimin.fk.entity.FkCaptureMetadata
 import com.alimin.fk.entity.FkResult
 import com.alimin.fk.source.FkCompressedImageSource
-import com.alimin.fk.source.FkSurfaceTextureSource
+import com.alimin.fk.source.FkSurfaceTextureSource2
 import com.alimin.fk.source.FkYUV420SPImageSource
 import com.alimin.fk.utils.FkCaptureReqUtils
 import com.alimin.fk.utils.FkLogcat
@@ -38,7 +39,7 @@ class FkCamera2(private val manager: CameraManager) : FkAbsCamera() {
     private lateinit var thread: HandlerThread
     private lateinit var handler: Handler
     private var curFeatures: FkCameraFeatures? = null
-    private val surfaceSource = FkSurfaceTextureSource()
+    private val surfaceSource = FkSurfaceTextureSource2()
     private var captureSession: FkAbsCameraSession? = null
     private var mPreviewReqBuilder: CaptureRequest.Builder? = null
     private var cameraSettings = FkCameraSettings(FkCameraFeatures.kFacing.Front, Size(1080, 1920), Size(1080, 1920))
@@ -136,7 +137,7 @@ class FkCamera2(private val manager: CameraManager) : FkAbsCamera() {
         return 0
     }
 
-    override fun getImageSource(): FkAbsImageSource = surfaceSource
+    override fun getImageSource(): FkAbsImageSource2 = surfaceSource
 
     override fun takePicture(listener: OnCaptureListener): Int {
         if (cameraDevice == null) {

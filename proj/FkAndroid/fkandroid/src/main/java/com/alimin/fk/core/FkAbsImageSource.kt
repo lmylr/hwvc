@@ -9,7 +9,7 @@ abstract class FkAbsImageSource {
     protected abstract val handle: Long
     companion object {
 
-        external fun nativeCreateSurface(instance: FkAbsImageSource): Long
+        external fun nativeCreateSurface(instance: Any): Long
 
         external fun nativeCreateCompressed(instance: FkAbsImageSource, buf: ByteBuffer, orientation: Int): Long
 

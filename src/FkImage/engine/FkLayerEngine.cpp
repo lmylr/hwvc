@@ -216,7 +216,7 @@ FkID FkLayerEngine::newLayerWithSource(const std::shared_ptr<FkAbsImageSource> &
     if (FK_ID_NONE != id) {
         auto msg = FkMessage::obtain(FK_WRAP_FUNC(FkLayerEngine::_updateLayerWithSource));
         msg->arg1 = id;
-        msg->sp = std::move(source);
+        msg->sp = source;
         sendMessage(msg);
     }
     return id;

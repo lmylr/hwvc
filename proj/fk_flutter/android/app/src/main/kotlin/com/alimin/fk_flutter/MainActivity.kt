@@ -17,6 +17,7 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import com.alimin.fk.FilmKilns
 import com.alimin.fk.core.FkAbsImageSource
+import com.alimin.fk.core.FkAbsImageSource2
 import com.alimin.fk.define.kScaleType
 import com.alimin.fk.device.FkAbsCamera
 import com.alimin.fk.device.FkCamera2
@@ -178,8 +179,8 @@ class MainActivity : FlutterActivity(), MethodChannel.MethodCallHandler, Texture
                             result.error("-1", "Capture fail", null)
                         } else {
                             val engine = FkImage(handle.toLong())
-                            val layerId = engine.newLayerWithSource(source)
-                            result.success(layerId)
+//                            val layerId = engine.newLayerWithSource(source)
+//                            result.success(layerId)
                         }
                     }
                 })
@@ -204,9 +205,9 @@ class MainActivity : FlutterActivity(), MethodChannel.MethodCallHandler, Texture
                         it.copyPixelsToBuffer(buffer)
                         val source = FkBitmapSource(buffer, it.width, it.height)
                         val engine = FkImage(handle.toLong())
-                        val layerId = engine.newLayerWithSource(source)
-                        FkLogcat.i("FkBitmap", "FkBitmapSource layerId=$layerId")
-                        result.success(layerId)
+//                        val layerId = engine.newLayerWithSource(source)
+//                        FkLogcat.i("FkBitmap", "FkBitmapSource layerId=$layerId")
+//                        result.success(layerId)
                     }
                 return
             }
@@ -235,7 +236,7 @@ class MainActivity : FlutterActivity(), MethodChannel.MethodCallHandler, Texture
         camera = FkCamera2(cameraManager!!)
         camera?.let {
             val engine = FkImage(handle.toLong())
-            it.getImageSource().addOnRenderListener(object : FkAbsImageSource.OnRenderListener{
+            it.getImageSource().addOnRenderListener(object : FkAbsImageSource2.OnRenderListener{
                 override fun onCreate() {
                 }
 

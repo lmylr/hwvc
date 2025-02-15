@@ -7,6 +7,7 @@ import android.view.Choreographer
 import android.view.Surface
 import androidx.annotation.Keep
 import com.alimin.fk.core.FkAbsImageSource
+import com.alimin.fk.core.FkAbsImageSource2
 import com.alimin.fk.core.FkPaint
 import com.alimin.fk.define.kScaleType
 import com.alimin.fk.entity.FkResult
@@ -89,9 +90,12 @@ class FkImage(handle: Long) : FkEngine(handle) {
     /**
      * @return Layer id.
      */
-    fun newLayerWithSource(source: FkAbsImageSource): Int {
+    fun newLayerWithSource(source: FkAbsImageSource2): Int {
         if (!isNull()) {
-            return nativeNewLayerWithSource(getHandle(), source.getNativeHandle())
+            return source.with {
+                val layerId = nativeNewLayerWithSource(getHandle(), it)
+                return@with layerId
+            }
         }
         return -1
     }
