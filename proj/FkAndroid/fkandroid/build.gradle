@@ -93,4 +93,5 @@ dependencies {
     implementation "androidx.appcompat:appcompat:$androidx_version"
     implementation "androidx.core:core-ktx:$androidx_version"
     api 'com.google.protobuf:protobuf-java:3.19.4'
+    api project(path: ':fkpreauto')
 }

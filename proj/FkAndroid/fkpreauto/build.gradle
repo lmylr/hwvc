@@ -1,0 +1,15 @@
+plugins {
+    id 'java-library'
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation "com.google.auto.service:auto-service:1.0-rc6"
+    annotationProcessor "com.google.auto.service:auto-service:1.0-rc6"
+    implementation "org.apache.velocity:velocity-engine-core:2.3"
+}

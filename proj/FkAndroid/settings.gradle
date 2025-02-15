@@ -1,1 +1,2 @@
 include ':fkapp2', ':fkandroid', ":hwmvp", ':hwcommon'
+include ':fkpreauto'
