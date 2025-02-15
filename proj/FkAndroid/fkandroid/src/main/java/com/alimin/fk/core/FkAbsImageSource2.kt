@@ -1,7 +1,5 @@
 package com.alimin.fk.core
 
-import com.filmkilns.preauto.core.FkNativeObject
-
 abstract class FkAbsImageSource2 : FkNativeObject() {
     abstract fun onCreate(arg0: Int, arg1: Long, arg2: String?): Int
     abstract fun onDestroy(): Int

@@ -1,42 +1,63 @@
-package com.filmkilns.preauto.processor;
+package com.filmkilns.preauto.processor
 
-import com.google.auto.service.AutoService;
+import com.filmkilns.annotation.FkNativeAuto
+import com.google.auto.service.AutoService
+import java.io.File
+import java.util.HashSet
+import javax.annotation.processing.AbstractProcessor
+import javax.annotation.processing.Messager
+import javax.annotation.processing.ProcessingEnvironment
+import javax.annotation.processing.RoundEnvironment
+import javax.annotation.processing.SupportedSourceVersion
+import javax.lang.model.SourceVersion
+import javax.lang.model.element.ElementKind
+import javax.lang.model.element.TypeElement
+import javax.tools.Diagnostic
 
-import java.util.Set;
+@AutoService(Process::class)
+@SupportedSourceVersion(SourceVersion.RELEASE_8)
+class FkNativeAutoProcessor : AbstractProcessor() {
+    companion object {
+        const val TAG = "FkNativeAutoProcessor"
+    }
+    private var messager: Messager? = null
 
-import javax.annotation.processing.AbstractProcessor;
-import javax.annotation.processing.Messager;
-import javax.annotation.processing.ProcessingEnvironment;
-import javax.annotation.processing.RoundEnvironment;
-import javax.lang.model.SourceVersion;
-import javax.lang.model.element.TypeElement;
-import javax.tools.Diagnostic;
-
-@AutoService(Process.class)
-public class FkNativeAutoProcessor extends AbstractProcessor {
-    private Messager messager;
-
-    @Override
-    public synchronized void init(ProcessingEnvironment processingEnvironment) {
-        super.init(processingEnvironment);
-        messager = processingEnvironment.getMessager();
+    override fun init(processingEnvironment: ProcessingEnvironment) {
+        super.init(processingEnvironment)
+        messager = processingEnvironment.messager
+        val file = File("/Volumes/FXS790_HD/Documents/Projects/AndroidStudioProjects/FilmKilns/proj/fk_flutter/test.txt")
+        if (!file.exists()) {
+            file.createNewFile()
+        }
     }
 
-    @Override
-    public boolean process(Set<? extends TypeElement> set, RoundEnvironment roundEnvironment) {
-        return false;
+    override fun process(set: Set<TypeElement?>?, roundEnvironment: RoundEnvironment): Boolean {
+        try {
+            val elements = roundEnvironment.getElementsAnnotatedWith(FkNativeAuto::class.java).filter { it.kind == ElementKind.CLASS }
+            elements.forEach {
+                logI(TAG, it.simpleName.toString())
+            }
+            val file = File("/Volumes/FXS790_HD/Documents/Projects/AndroidStudioProjects/FilmKilns/proj/fk_flutter/test.txt")
+            if (!file.exists()) {
+                file.createNewFile()
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        return true
     }
 
-    @Override
-    public SourceVersion getSupportedSourceVersion() {
-        return SourceVersion.latestSupported();
+    override fun getSupportedAnnotationTypes(): Set<String> {
+        val sets = HashSet<String>()
+        sets.add(FkNativeAuto::class.java.canonicalName)
+        return sets
     }
 
-    protected void logI(String msg) {
-        messager.printMessage(Diagnostic.Kind.NOTE, msg);
+    protected fun logI(tag: String, msg: String?) {
+        messager!!.printMessage(Diagnostic.Kind.NOTE, "$tag: $msg")
     }
 
-    protected void logE(String msg) {
-        messager.printMessage(Diagnostic.Kind.ERROR, msg);
+    protected fun logE(tag: String, msg: String?) {
+        messager!!.printMessage(Diagnostic.Kind.ERROR, "$tag: $msg")
     }
 }

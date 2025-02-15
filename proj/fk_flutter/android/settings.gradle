@@ -23,6 +23,7 @@ plugins {
     id "org.jetbrains.kotlin.android" version "1.9.0" apply false
 }
 
-include ":app", ":fkpreauto", ":fkandroid"
+include ":app", ":fkannotation", ":fkpreauto", ":fkandroid"
+project(":fkannotation").projectDir = new File("../../FkAndroid/fkannotation")
 project(":fkpreauto").projectDir = new File("../../FkAndroid/fkpreauto")
 project(":fkandroid").projectDir = new File("../../FkAndroid/fkandroid")

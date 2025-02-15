@@ -94,8 +94,8 @@ class FkImage(handle: Long) : FkEngine(handle) {
         if (!isNull()) {
             return source.with {
                 val layerId = nativeNewLayerWithSource(getHandle(), it)
-                return@with layerId
-            }
+                return@with FkResult(layerId, "layerId")
+            }.code
         }
         return -1
     }

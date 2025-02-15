@@ -4,12 +4,13 @@ import android.graphics.Point
 import android.graphics.PointF
 import android.graphics.SurfaceTexture
 import android.view.Surface
-import com.alimin.fk.core.FkAbsImageSource
 import com.alimin.fk.core.FkAbsImageSource2
 import com.alimin.fk.entity.FkResult
 import com.alimin.fk.utils.FkLogcat
+import com.filmkilns.annotation.FkNativeAuto
 import java.lang.Exception
 
+@FkNativeAuto(path = "cpp/native/core")
 class FkSurfaceTextureSource2 : FkAbsImageSource2() {
     private var surface: Surface? = null
     private var surfaceTexture: SurfaceTexture? = null
@@ -26,7 +27,7 @@ class FkSurfaceTextureSource2 : FkAbsImageSource2() {
         private val TAG = "FkSurfaceTextureSource2"
     }
 
-    override fun create(): Int {
+    override fun create(): FkResult {
         val ret = super.create()
         reqDestroy = false
         surfaceTexture = SurfaceTexture(0)
@@ -42,7 +43,7 @@ class FkSurfaceTextureSource2 : FkAbsImageSource2() {
         return ret
     }
 
-    override fun destroy(): Int {
+    override fun destroy(): FkResult {
         val ret = super.destroy()
         FkLogcat.i(TAG, "destroy")
         reqDestroy = true
