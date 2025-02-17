@@ -3,6 +3,7 @@ package com.filmkilns.preauto.processor;
 import java.util.Set;
 
 import javax.annotation.processing.AbstractProcessor;
+import javax.annotation.processing.Filer;
 import javax.annotation.processing.Messager;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
@@ -12,6 +13,7 @@ import javax.tools.Diagnostic;
 
 public class FkAbsProcessor extends AbstractProcessor {
     private Messager messager;
+    private javax.annotation.processing.Filer filer;
     @Override
     public boolean process(Set<? extends TypeElement> set, RoundEnvironment env) {
         return false;
@@ -31,13 +33,18 @@ public class FkAbsProcessor extends AbstractProcessor {
     public synchronized void init(ProcessingEnvironment processingEnvironment) {
         super.init(processingEnvironment);
         messager = processingEnvironment.getMessager();
+        filer = processingEnvironment.getFiler();
     }
 
-    protected void logI(String msg) {
-        messager.printMessage(Diagnostic.Kind.NOTE, msg);
+    public Filer getFiler() {
+        return filer;
     }
 
-    protected void logE(String msg) {
-        messager.printMessage(Diagnostic.Kind.ERROR, msg);
+    protected void logI(String tag, String msg) {
+        messager.printMessage(Diagnostic.Kind.NOTE, tag +": " + msg);
+    }
+
+    protected void logE(String tag, String msg) {
+        messager.printMessage(Diagnostic.Kind.ERROR, tag +": " + msg);
     }
 }

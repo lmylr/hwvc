@@ -11,8 +11,8 @@ java {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.0"
-    implementation "com.google.auto.service:auto-service:1.0-rc6"
-    annotationProcessor "com.google.auto.service:auto-service:1.0-rc6"
+    implementation "com.google.auto.service:auto-service:1.1.1"
+    annotationProcessor "com.google.auto.service:auto-service:1.1.1"
     implementation "org.apache.velocity:velocity-engine-core:2.3"
     implementation project(':fkannotation')
 }

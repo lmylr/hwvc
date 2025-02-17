@@ -92,6 +92,7 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     implementation "androidx.appcompat:appcompat:$androidx_version"
     implementation "androidx.core:core-ktx:$androidx_version"
+    implementation "androidx.annotation:annotation:1.0.0"
     api 'com.google.protobuf:protobuf-java:3.19.4'
     implementation project(':fkannotation')
     annotationProcessor project(':fkpreauto')
