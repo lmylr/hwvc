@@ -11,13 +11,9 @@ import javax.lang.model.SourceVersion;
 import javax.lang.model.element.TypeElement;
 import javax.tools.Diagnostic;
 
-public class FkAbsProcessor extends AbstractProcessor {
+public abstract class FkAbsProcessor extends AbstractProcessor {
     private Messager messager;
     private javax.annotation.processing.Filer filer;
-    @Override
-    public boolean process(Set<? extends TypeElement> set, RoundEnvironment env) {
-        return false;
-    }
 
     @Override
     public SourceVersion getSupportedSourceVersion() {
@@ -33,7 +29,7 @@ public class FkAbsProcessor extends AbstractProcessor {
     public synchronized void init(ProcessingEnvironment processingEnvironment) {
         super.init(processingEnvironment);
         messager = processingEnvironment.getMessager();
-        filer = processingEnvironment.getFiler();
+//        filer = processingEnvironment.getFiler();
     }
 
     public Filer getFiler() {

@@ -2,6 +2,7 @@ package com.filmkilns.preauto.processor;
 
 import com.filmkilns.annotation.FkNativeAuto;
 import com.google.auto.service.AutoService;
+import com.google.common.collect.ImmutableSet;
 
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
@@ -34,7 +35,6 @@ public class FkNativeAutoProcessor extends FkAbsProcessor {
 
     @Override
     public boolean process(Set<? extends TypeElement> set, RoundEnvironment env) {
-        super.process(set, env);
         logI(TAG, "process");
         VelocityEngine ve = new VelocityEngine();
         ve.setProperty(RuntimeConstants.FILE_RESOURCE_LOADER_PATH, new File("/Volumes/FXS790_HD/Documents/Projects/AndroidStudioProjects/FilmKilns/proj/FkAndroid", "fkpreauto/src/main/resources/").getAbsolutePath());
@@ -55,13 +55,11 @@ public class FkNativeAutoProcessor extends FkAbsProcessor {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        return true;
+        return false;
     }
 
     @Override
     public Set<String> getSupportedAnnotationTypes() {
-        Set<String> sets = new HashSet<>();
-        sets.add(FkNativeAuto.class.getCanonicalName());
-        return sets;
+        return ImmutableSet.of(FkNativeAuto.class.getCanonicalName());
     }
 }

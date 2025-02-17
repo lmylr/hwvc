@@ -7,10 +7,8 @@ import android.view.Surface
 import com.alimin.fk.core.FkAbsImageSource2
 import com.alimin.fk.entity.FkResult
 import com.alimin.fk.utils.FkLogcat
-import com.filmkilns.annotation.FkNativeAuto
 import java.lang.Exception
 
-@FkNativeAuto(path = "cpp/native/core")
 class FkSurfaceTextureSource2 : FkAbsImageSource2() {
     private var surface: Surface? = null
     private var surfaceTexture: SurfaceTexture? = null
