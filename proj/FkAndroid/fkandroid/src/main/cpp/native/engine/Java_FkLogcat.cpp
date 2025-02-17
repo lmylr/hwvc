@@ -13,7 +13,7 @@
 extern "C" {
 #endif
 
-JNIEXPORT void Java_com_alimin_fk_utils_FkLogcat_00024Companion_nativeLog
+JNIEXPORT void Java_com_alimin_fk_utils_FkLogcat_nativeLog
         (JNIEnv *env, jobject that, jint type, jstring tag, jstring msg) {
     FkJniStringUTF8 _tag(env, tag);
     FkJniStringUTF8 _msg(env, msg);
