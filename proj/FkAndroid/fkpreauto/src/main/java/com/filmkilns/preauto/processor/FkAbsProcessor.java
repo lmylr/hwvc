@@ -13,7 +13,8 @@ import javax.tools.Diagnostic;
 
 public abstract class FkAbsProcessor extends AbstractProcessor {
     private Messager messager;
-    private javax.annotation.processing.Filer filer;
+    private Filer filer;
+    private String projectDir, sourceMainDir;
 
     @Override
     public SourceVersion getSupportedSourceVersion() {
@@ -28,12 +29,22 @@ public abstract class FkAbsProcessor extends AbstractProcessor {
     @Override
     public synchronized void init(ProcessingEnvironment processingEnvironment) {
         super.init(processingEnvironment);
+        projectDir = processingEnvironment.getOptions().getOrDefault("projectDir", ".");
+        sourceMainDir = processingEnvironment.getOptions().getOrDefault("sourceMainDir", ".");
         messager = processingEnvironment.getMessager();
 //        filer = processingEnvironment.getFiler();
     }
 
     public Filer getFiler() {
         return filer;
+    }
+
+    public String getProjectDir() {
+        return projectDir;
+    }
+
+    public String getSourceMainDir() {
+        return sourceMainDir;
     }
 
     protected void logI(String tag, String msg) {

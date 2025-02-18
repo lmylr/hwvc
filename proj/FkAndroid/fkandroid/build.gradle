@@ -36,6 +36,15 @@ android {
                                "../../../src/third_party/skia/shared"]
         }
         buildConfigField("boolean", "ENABLE_UNIT_TEST", "false")
+
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments = [
+                        projectDir : project.projectDir.absolutePath,
+                        sourceMainDir : project.projectDir.absolutePath + "/src/main",
+                ]
+            }
+        }
     }
 
     buildTypes {
@@ -77,11 +86,11 @@ android {
         buildConfig true
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "17"
     }
 }
 

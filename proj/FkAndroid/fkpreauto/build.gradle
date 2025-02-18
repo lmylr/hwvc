@@ -6,11 +6,18 @@ plugins {
 java {
     sourceCompatibility = JavaVersion.VERSION_17
     targetCompatibility = JavaVersion.VERSION_17
+    compileJava {
+        doFirst {
+            options.compilerArgs = [
+                    '--add-exports', 'jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED'
+            ]
+        }
+    }
 }
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.0"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.22"
     implementation "com.google.auto.service:auto-service:1.1.1"
     annotationProcessor "com.google.auto.service:auto-service:1.1.1"
     implementation "org.apache.velocity:velocity-engine-core:2.3"
