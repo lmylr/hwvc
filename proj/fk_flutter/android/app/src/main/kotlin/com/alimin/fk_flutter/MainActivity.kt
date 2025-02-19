@@ -18,6 +18,7 @@ import android.widget.FrameLayout
 import com.alimin.fk.FilmKilns
 import com.alimin.fk.core.FkAbsImageSource
 import com.alimin.fk.core.FkAbsImageSource2
+import com.alimin.fk.core.FkNativeObject
 import com.alimin.fk.define.kScaleType
 import com.alimin.fk.device.FkAbsCamera
 import com.alimin.fk.device.FkCamera2
@@ -28,6 +29,7 @@ import com.alimin.fk.entity.FkCameraFeatures
 import com.alimin.fk.entity.FkCameraSettings
 import com.alimin.fk.entity.FkResult
 import com.alimin.fk.source.FkBitmapSource
+import com.alimin.fk.source.FkNativeTestObject
 import com.alimin.fk.utils.FkLogcat
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.android.FlutterActivityLaunchConfigs
@@ -67,6 +69,9 @@ class MainActivity : FlutterActivity(), MethodChannel.MethodCallHandler, Texture
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         FilmKilns.init(applicationContext)
+        val obj = FkNativeTestObject()
+        obj.create()
+        obj.destroy()
         Log.i(TAG, "transparencyMode=${transparencyMode}")
         flutterEngine?.apply {
             Log.i(TAG, "Create media_editor channel")

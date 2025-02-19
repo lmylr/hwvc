@@ -12,6 +12,7 @@ import org.apache.velocity.util.introspection.UberspectImpl;
 import org.apache.velocity.util.introspection.UberspectPublicFields;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
@@ -31,6 +32,9 @@ import com.sun.tools.javac.code.Type;
 @AutoService(Processor.class)
 public class FkNativeAutoProcessor extends FkAbsProcessor {
     private final static String TAG = "FkNativeAutoProcessor";
+    private final static Class[] SIG_MAP_ID = {boolean.class, byte.class, char.class, short.class, int.class, long.class, float.class, double.class, void.class, String.class, Object.class};
+    private final static String[] SIG_MAP_V = {"Z", "B", "C", "S", "I", "J", "F", "D", "V", "Ljava/lang/String;", "Ljava/lang/Object;"};
+    private VelocityEngine engine;
 
     private static class CreationItem {
         String name;
@@ -39,7 +43,8 @@ public class FkNativeAutoProcessor extends FkAbsProcessor {
         @Override
         public String toString() {
             return "CreationItem{" +
-                    "path='" + path + '\'' +
+                    "name='" + name + '\'' +
+                    ", path='" + path + '\'' +
                     '}';
         }
     }
@@ -48,11 +53,18 @@ public class FkNativeAutoProcessor extends FkAbsProcessor {
     public synchronized void init(ProcessingEnvironment processingEnvironment) {
         super.init(processingEnvironment);
         logI(TAG, "init: projectDir=" + getProjectDir() + ", mainDir=" + getSourceMainDir());
+        engine = new VelocityEngine();
+        engine.setProperty(RuntimeConstants.FILE_RESOURCE_LOADER_PATH, new File("/Volumes/FXS790_HD/Documents/Projects/AndroidStudioProjects/FilmKilns/proj/FkAndroid", "fkpreauto/src/main/resources/").getAbsolutePath());
+        engine.setProperty(RuntimeConstants.UBERSPECT_CLASSNAME, UberspectImpl.class.getName() + ", " + UberspectPublicFields.class.getName());
+        engine.init();
     }
 
-    @Override
-    public boolean process(Set<? extends TypeElement> set, RoundEnvironment env) {
-        logI(TAG, "process");
+    private String getSimpleClassName(Symbol.ClassSymbol symbol) {
+        String name = symbol.className();
+        return name.substring(name.lastIndexOf(".") + 1);
+    }
+
+    private List<CreationItem> getCreationItems(RoundEnvironment env) {
         Set<? extends Element> elements = env.getElementsAnnotatedWith(FkNativeAuto.class);
         List<CreationItem> items = new ArrayList<>();
         for (Element e : elements) {
@@ -60,31 +72,57 @@ public class FkNativeAutoProcessor extends FkAbsProcessor {
                 Symbol.ClassSymbol symbol = (Symbol.ClassSymbol) e;
                 FkNativeAuto ann = symbol.getAnnotation(FkNativeAuto.class);
                 CreationItem creation = new CreationItem();
-                creation.name = symbol.className();
+                creation.name = getSimpleClassName(symbol);
                 creation.path = ann.path();
                 items.add(creation);
             }
         }
-        logI(TAG, "items: " + items);
-//        VelocityEngine ve = new VelocityEngine();
-//        ve.setProperty(RuntimeConstants.FILE_RESOURCE_LOADER_PATH, new File("/Volumes/FXS790_HD/Documents/Projects/AndroidStudioProjects/FilmKilns/proj/FkAndroid", "fkpreauto/src/main/resources/").getAbsolutePath());
-//        ve.setProperty(RuntimeConstants.UBERSPECT_CLASSNAME, UberspectImpl.class.getName() + ", " + UberspectPublicFields.class.getName());
-//        ve.init();;
-//        String classPackage = "com.alimin.fk.core";
-//        String $className = "FkSurfaceTextureSource3";
-//        Template t = ve.getTemplate("FkNativeInterface.mv");
-//        VelocityContext ctx = new VelocityContext();
+        return items;
+    }
+
+    private void generate(CreationItem item) {
+        String dirStr = getSourceMainDir() + "/" + item.path;
+        File dir = new File(dirStr);
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
+//        generateHeader(new File(dir,  item.name + ".h"));
+    }
+
+    private Template createTemplate(String tempName) {
+        return engine.getTemplate(tempName);
+    }
+
+    private void generateHeader(File file) {
+        if (file.exists()) {
+            file.delete();
+        }
+        VelocityContext ctx = new VelocityContext();
 //        ctx.put("classPackage", classPackage);
 //        ctx.put("$className", $className);
-//        try {
-//            JavaFileObject source = getFiler().createSourceFile(classPackage + "." + $className);
-//            Writer writer = source.openWriter();
-//            t.merge(ctx, writer);
-//            writer.flush();
-//            writer.close();
-//        } catch (IOException e) {
-//            throw new RuntimeException(e);
-//        }
+        try {
+            FileWriter writer = new FileWriter(file);
+            Template template = createTemplate("FkNativeInterface.temp");
+            template.merge(ctx, writer);
+            writer.flush();
+            writer.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void generateCPP() {
+
+    }
+
+    @Override
+    public boolean process(Set<? extends TypeElement> set, RoundEnvironment env) {
+        logI(TAG, "process");
+        List<CreationItem> items = getCreationItems(env);
+        logI(TAG, "items: " + items);
+        for (CreationItem it : items) {
+            generate(it);
+        }
         return false;
     }
 

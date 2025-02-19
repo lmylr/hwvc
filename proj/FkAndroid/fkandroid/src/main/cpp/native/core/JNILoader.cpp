@@ -6,6 +6,7 @@
 */
 #include "jni.h"
 #include "FkJavaRuntime.h"
+#include "FkJavaRegister.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -13,6 +14,11 @@ extern "C" {
 
 JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     FkJavaRuntime::getInstance().attach(vm);
+    JNIEnv *pEnv = nullptr;
+    vm->GetEnv(reinterpret_cast<void **>(&pEnv), FkJavaRuntime::VERSION);
+    if (nullptr != pEnv) {
+        f_kilns::jni_register_all(pEnv);
+    }
     return FkJavaRuntime::VERSION;
 }
 

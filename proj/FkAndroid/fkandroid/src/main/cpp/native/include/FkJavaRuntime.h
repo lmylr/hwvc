@@ -51,6 +51,8 @@ public:
 
     static void jniThreadDestroy(void *envPtr);
 
+    static bool jniRegister(JNIEnv *env, const char *clsName, const JNINativeMethod *methods, int len);
+
 public:
     FkJavaRuntime();
 

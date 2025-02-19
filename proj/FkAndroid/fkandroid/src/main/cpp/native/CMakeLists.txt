@@ -37,11 +37,13 @@ aux_source_directory(${PROJECT_SOURCE_DIR}/core SOURCES_CORE)
 aux_source_directory(${PROJECT_SOURCE_DIR}/engine SOURCES_ENGINE)
 aux_source_directory(${PROJECT_SOURCE_DIR}/engine_fk SOURCES_ENGINE_FK)
 aux_source_directory(${PROJECT_SOURCE_DIR}/entity SOURCES_ENTITY)
+aux_source_directory(${PROJECT_SOURCE_DIR}/source SOURCES_SOURCE)
 
 list(APPEND SOURCES_ROOT ${SOURCES_CORE})
 list(APPEND SOURCES_ROOT ${SOURCES_ENGINE})
 list(APPEND SOURCES_ROOT ${SOURCES_ENGINE_FK})
 list(APPEND SOURCES_ROOT ${SOURCES_ENTITY})
+list(APPEND SOURCES_ROOT ${SOURCES_SOURCE})
 
 find_library(
         log-lib

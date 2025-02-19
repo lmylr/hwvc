@@ -30,6 +30,26 @@ void FkJavaRuntime::jniThreadDestroy(void *envPtr) {
     }
 }
 
+bool FkJavaRuntime::jniRegister(JNIEnv *env, const char *clsName, const JNINativeMethod *methods, int len) {
+    if (env == nullptr) {
+        FkLogE(TAG, "[FAIL] JNIEnv is null.");
+        return false;
+    }
+    jclass cls = env->FindClass(clsName);
+    if (cls == nullptr) {
+        FkLogE(TAG, "[FAIL] Class %s not found.", clsName);
+        return false;
+    }
+    auto ret = env->RegisterNatives(cls, methods, len) == JNI_OK;
+    env->DeleteLocalRef(cls);
+    if (!ret) {
+        FkLogE(TAG, "[FAIL] Class %s register fail.", clsName);
+    } else {
+        FkLogD(TAG, "[ OK ] Class %s register success.", clsName);
+    }
+    return ret;
+}
+
 FkJavaRuntime::FkJavaRuntime() : FkObject() {
 }
 
