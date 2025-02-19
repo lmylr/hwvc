@@ -36,7 +36,7 @@ void *FkPlugin_create(const char *name) {
     if (plugin) {
         return (void *) FkInstanceHolder::getInstance().put(plugin);
     } else {
-        FkLogE(TAG, "[Fail] Can not create plugin by name=%s", name);
+        FkLogE(TAG, "[FAIL] Can not create plugin by name=%s", name);
         return nullptr;
     }
 }
@@ -63,7 +63,7 @@ int FkPlugin_updateParams(void *handle, const void *data, int size) {
 Array FkPlugin_getParam(void *handle, const char *key) {
     auto plugin = FkInstanceHolder::getInstance().find<std::shared_ptr<FkAbsPlugin>>((long) handle);
     if (plugin == nullptr) {
-        FkLogW(TAG, "[Fail] Get plugin instance(%p)", handle);
+        FkLogW(TAG, "[FAIL] Get plugin instance(%p)", handle);
         return {};
     }
     auto value = plugin->getParam(key);
@@ -80,7 +80,7 @@ Array FkPlugin_getParam(void *handle, const char *key) {
     if (!pbValue.SerializeToArray(array.data, array.len)) {
         array.len = 0;
         delete[] array.data;
-        FkLogW(TAG, "[Fail] Get value by key=%s", key);
+        FkLogW(TAG, "[FAIL] Get value by key=%s", key);
         return {};
     }
     return array;

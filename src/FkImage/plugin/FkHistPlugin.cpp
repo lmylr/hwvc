@@ -215,7 +215,7 @@ FkResult FkHistPlugin::_copyHistBuf2Tex() {
                                                       sizeof(GLint), GL_MAP_READ_BIT));
     if (values == nullptr) {
         GLenum e = glGetError();
-        FkLogW(TAG, "[Fail] Read hist buffer error(%i, 0x%x)", e, e);
+        FkLogW(TAG, "[FAIL] Read hist buffer error(%i, 0x%x)", e, e);
         return FK_FAIL;
     }
     int maxValue = values[0];
