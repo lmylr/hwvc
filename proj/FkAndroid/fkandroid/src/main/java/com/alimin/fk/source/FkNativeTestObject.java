@@ -2,7 +2,9 @@ package com.alimin.fk.source;
 
 import com.alimin.fk.core.FkNativeObject;
 import com.alimin.fk.entity.FkResult;
+import com.filmkilns.annotation.FkNativeAuto;
 
+@FkNativeAuto(path = "cpp/native/source")
 public class FkNativeTestObject extends FkNativeObject {
     @Override
     public long onNativeCreate() {

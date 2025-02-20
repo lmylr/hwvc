@@ -9,7 +9,8 @@ java {
     compileJava {
         doFirst {
             options.compilerArgs = [
-                    '--add-exports', 'jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED'
+                    '--add-exports', 'jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED',
+                    '--add-exports', 'jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED'
             ]
         }
     }
