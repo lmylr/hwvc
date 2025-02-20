@@ -17,7 +17,7 @@ JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     JNIEnv *pEnv = nullptr;
     vm->GetEnv(reinterpret_cast<void **>(&pEnv), FkJavaRuntime::VERSION);
     if (nullptr != pEnv) {
-        f_kilns::jni_register_all(pEnv);
+        film_k::jni_register_all(pEnv);
     }
     return FkJavaRuntime::VERSION;
 }

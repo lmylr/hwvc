@@ -4,6 +4,6 @@
 #pragma once
 #include <jni.h>
 
-namespace f_kilns {
+namespace film_k {
     void jni_register_all(JNIEnv *env);
 }

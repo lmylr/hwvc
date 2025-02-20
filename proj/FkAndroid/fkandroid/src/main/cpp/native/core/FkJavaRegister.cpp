@@ -6,7 +6,7 @@
 #include "FkJniDefinition.h"
 #include "../source/Java_FkNativeTestObject.h"
 
-namespace f_kilns {
+namespace film_k {
     const char *TAG = "FkJavaRegister";
 
     void jni_register_all(JNIEnv *env) {
